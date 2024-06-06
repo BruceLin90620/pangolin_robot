@@ -7,47 +7,71 @@ import numpy as np
 from Pangolin_Config import PangolinConfiguration, PangolinDynamixel
 from Pangolin_Gait import gait_dic
 
+import atexit
+import threading
+
 class PangolinControl:
     def __init__(self):
 
         self.control_cmd = ControlCmd()
+        pangolin_config = PangolinConfiguration()
         self.is_walking = False
 
-        self.motor_origin_pos = np.array[0, 0, 0, 0, 0, 0, 0, 0]
+        self.motor_origin_pos = np.zeros(6)
 
-        self.gait_name = 'move_linear'
+        self.leg_center_position = pangolin_config.leg_center_position
 
+        self.motor_position = np.zeros(0)
 
     def reset_to_orginal(self): 
         pass
 
     def process_gait(self):
+        head_position = np.array([2000, 2000])
+        spine_position = np.array([2000, 2000])
+
         if self.gait_name == 'move_linear':
-            # while True:
-            for motor_position in gait_dic[self.gait_name]:
-            # if self.is_walking == False: break
-                print(motor_position)
-                time.sleep(1)
-            # self.control_cmd.leg_motor_position_control()
+            while True:
+                for motor_position in gait_dic[self.gait_name]:
+                    if self.is_walking == False: break
+                    self.angle_to_servo(np.array(motor_position), head_position, spine_position)
+                    self.control_cmd.motor_position_control(self.motor_position)
 
-    def angle_to_servo(self, motor_angle: np.array)-> np.array: 
+    def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 
+        self.motor_position = np.zeros(8)
+        direction = np.array([1, -1, 1, -1])
+
+        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(direction) + self.leg_center_position
+
+        self.motor_position[:4] = leg_motor_pos
+
+        head_motor_pos = head_motor_angle
+        self.motor_position[4:6] = head_motor_pos
+
+        spine_motor_pos = spine_motor_angle
+        self.motor_position[6:8] = spine_motor_pos
+
+        print(self.motor_position)
+
+    # Start moving 
+    def start_gait(self):
+        self.is_walking = True
+        self.is_turning = True
+
+        self.walking_thread = threading.Thread(target=self.process_gait, args=(), daemon=True)
+        self.walking_thread.start()
+
+    # Stop moving 
+    def stop_gait(self):
+        self.is_walking = False
+        self.is_turning = False
+
+        self.reset_to_orginal()
+
+    # Set the twist msg to left and right side of the motors
+    def set_gait_name(self, gait_name='move_linear'):
+        self.gait_name = gait_name
         
-        motor_angle * 4095 / 360 * 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -129,16 +153,16 @@ class ControlCmd:
             self.joint_position.append(motor.PRESENT_POSITION_value)
 
     # Control all motors position
-    def motor_position_control(self, position = np.array[935, 2560, 2371, 1638, 1958, 2049, 2047, 2008]):
+    def motor_position_control(self, position):
         motor_id = 0
         for motor in self.leg_motor_list:
-            motor.writePosition(position[motor_id])
+            motor.writePosition(int(position[motor_id]))
             motor_id += 1
         for motor in self.head_motor_list:
-            motor.writePosition(position[motor_id])
+            motor.writePosition(int(position[motor_id]))
             motor_id += 1
         for motor in self.spine_motor_list:
-            motor.writePosition(position[motor_id])
+            motor.writePosition(int(position[motor_id]))
             motor_id += 1
 
         self.dynamixel.sentAllCmd()

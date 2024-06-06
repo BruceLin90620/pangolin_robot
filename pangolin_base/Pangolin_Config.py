@@ -1,3 +1,5 @@
+import numpy as np
+
 # main control command
 DEVICE_NAME = "/dev/ttyUSB0"
 B_RATE      = 57600
@@ -25,6 +27,8 @@ class PangolinConfiguration:
         self.W = 92
 
         self.dt = 0.01
+
+        self.leg_center_position = np.array([1535, 2561, 2567, 1525])
 
 class PangolinState:
      def __init__(self):

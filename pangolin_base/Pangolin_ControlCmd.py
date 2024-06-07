@@ -1,60 +1,113 @@
-from DXL_motor_control import DXL_Conmunication
+from DXL_motor_control import DXL_Communication
 import time
 import traceback
 from time import sleep
 import numpy as np
 
 from Pangolin_Config import PangolinConfiguration, PangolinDynamixel
-from Pangolin_Gait import gait_dic
+from Pangolin_Gait import PangolinGait
 
 import atexit
 import threading
 
 class PangolinControl:
+    """High-level control of the Pangolin robot."""
     def __init__(self):
 
         self.control_cmd = ControlCmd()
         pangolin_config = PangolinConfiguration()
-        self.is_walking = False
+        self.pangolin_gait = PangolinGait()
 
-        self.motor_origin_pos = np.zeros(6)
+        self.is_walking = False # Flag to indicate if the robot is walking
 
         self.leg_center_position = pangolin_config.leg_center_position
+        self.motor_position = np.zeros(8) 
+        self.head_position  = np.zeros(2)
+        self.spine_position = np.zeros(2)
 
-        self.motor_position = np.zeros(0)
+        self.linear_x = 1.0
+        self.angular_z = 1.0
+
+    def __del__(self): # Called when object is deleted
+        self.stop_gait()
+
+    def cleanup(self): # Ensures both high and low-level objects are cleaned up
+        self.__del__()
+        self.control_cmd.cleanup() 
+
 
     def reset_to_orginal(self): 
-        pass
+        """Resets the robot to its default pose."""
+
+        self.angle_to_servo(np.zeros(4), self.head_position, self.spine_position)
+        self.control_cmd.motor_position_control(self.motor_position)
+
 
     def process_gait(self):
-        head_position = np.array([2000, 2000])
-        spine_position = np.array([2000, 2000])
+        """Executes the selected gait pattern."""
+
+        self.set_gait_name('turn_right')
+        self.pangolin_gait.set_gait_dic()  # Initialize the gait dictionary
 
         if self.gait_name == 'move_linear':
             while True:
-                for motor_position in gait_dic[self.gait_name]:
-                    if self.is_walking == False: break
-                    self.angle_to_servo(np.array(motor_position), head_position, spine_position)
-                    self.control_cmd.motor_position_control(self.motor_position)
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+
+                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                        if self.is_walking == False: break
+
+                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                        self.control_cmd.motor_position_control(self.motor_position)
+                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+
+        
+        elif self.gait_name == 'turn_right':
+            while True:
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+
+                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                        if self.is_walking == False: break
+
+                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                        self.control_cmd.motor_position_control(self.motor_position)
+                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+
+
+        elif self.gait_name == 'turn_left':
+            while True:
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+
+                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                        if self.is_walking == False: break
+
+                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                        self.control_cmd.motor_position_control(self.motor_position)
+                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+
+
 
     def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 
+        """Converts desired joint angles into raw motor positions."""
+
         self.motor_position = np.zeros(8)
         direction = np.array([1, -1, 1, -1])
 
-        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(direction) + self.leg_center_position
+        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(direction) + self.leg_center_position[:4]
 
         self.motor_position[:4] = leg_motor_pos
 
-        head_motor_pos = head_motor_angle
+        head_motor_pos = head_motor_angle*(4095/360) + self.leg_center_position[4:6]
         self.motor_position[4:6] = head_motor_pos
 
-        spine_motor_pos = spine_motor_angle
+        spine_motor_pos = spine_motor_angle*(4095/360) + self.leg_center_position[6:8]
         self.motor_position[6:8] = spine_motor_pos
 
-        print(self.motor_position)
+        # print(self.motor_position)
 
-    # Start moving 
+
     def start_gait(self):
+        """Starts the gait in a thread."""
+
         self.is_walking = True
         self.is_turning = True
 
@@ -63,35 +116,43 @@ class PangolinControl:
 
     # Stop moving 
     def stop_gait(self):
+        """Stops the gait and resets to the original position."""
+
         self.is_walking = False
         self.is_turning = False
 
         self.reset_to_orginal()
 
-    # Set the twist msg to left and right side of the motors
     def set_gait_name(self, gait_name='move_linear'):
+        """Selects the gait pattern to use."""
+
         self.gait_name = gait_name
         
+    def set_head_position(self):
+        pass
 
+    def set_spine_position(self):
+        pass
 
 
 class ControlCmd:
+    """Low-level control of Dynamixel motors."""
     def __init__(self): 
 
         pangolin_config = PangolinConfiguration()
         pangolin_dynamixel = PangolinDynamixel()
 
         #Coummunicate the dynamixel motors
-        self.dynamixel = DXL_Conmunication(pangolin_dynamixel.DEVICE_NAME, pangolin_dynamixel.B_RATE)
+        self.dynamixel = DXL_Communication(pangolin_dynamixel.DEVICE_NAME, pangolin_dynamixel.B_RATE)
         self.dynamixel.activateDXLConnection()
 
         #Create the dynamixel motors
-        leg_motor_FL = self.dynamixel.createMotor('motor1', motor_number=1)
-        leg_motor_FR = self.dynamixel.createMotor('motor2', motor_number=2)
-        leg_motor_HL = self.dynamixel.createMotor('motor3', motor_number=3)
-        leg_motor_HR = self.dynamixel.createMotor('motor4', motor_number=4)
-        head_motor_Y = self.dynamixel.createMotor('motor5', motor_number=5)
-        head_motor_P = self.dynamixel.createMotor('motor6', motor_number=6)
+        leg_motor_FL  = self.dynamixel.createMotor('motor1', motor_number=1)
+        leg_motor_FR  = self.dynamixel.createMotor('motor2', motor_number=2)
+        leg_motor_HL  = self.dynamixel.createMotor('motor3', motor_number=3)
+        leg_motor_HR  = self.dynamixel.createMotor('motor4', motor_number=4)
+        head_motor_Y  = self.dynamixel.createMotor('motor5', motor_number=5)
+        head_motor_P  = self.dynamixel.createMotor('motor6', motor_number=6)
         spine_motor_Y = self.dynamixel.createMotor('motor7', motor_number=7)
         spine_motor_P = self.dynamixel.createMotor('motor8', motor_number=8)
  
@@ -113,8 +174,14 @@ class ControlCmd:
         #check list
         self.joint_position = []
 
-    def __del__(self):
+    def __del__(self): # Disable motors on object deletion
         self.disable_all_motor()
+
+    # Extends the cleanup process to close the communication handler
+    def cleanup(self): 
+        self.__del__()
+        self.dynamixel.closeHandler()
+
         
     def enable_all_motor(self):
         for motor in self.leg_motor_list:
@@ -153,7 +220,7 @@ class ControlCmd:
             self.joint_position.append(motor.PRESENT_POSITION_value)
 
     # Control all motors position
-    def motor_position_control(self, position):
+    def motor_position_control(self, position: np.array):
         motor_id = 0
         for motor in self.leg_motor_list:
             motor.writePosition(int(position[motor_id]))
@@ -167,6 +234,7 @@ class ControlCmd:
 
         self.dynamixel.sentAllCmd()
         time.sleep(1 / self.walking_freq)
+
 
 
 
@@ -191,10 +259,13 @@ if __name__ == "__main__":
     #     "stance":pangolin_control.stance_control,
     # }
     command_dict = {
-        "move":pangolin_control.process_gait,
+        "stop":pangolin_control.stop_gait,
+        "move":pangolin_control.start_gait,
         "read":pangolin_control.control_cmd.read_all_motor_data,
         "pos":pangolin_control.control_cmd.motor_position_control,
     }
+
+    atexit.register(pangolin_control.cleanup)
 
     while True:
         try:
@@ -206,3 +277,6 @@ if __name__ == "__main__":
         except Exception as e:
             traceback.print_exc()
             break
+
+        # finally:
+        #     atexit._run_exitfuncs() 

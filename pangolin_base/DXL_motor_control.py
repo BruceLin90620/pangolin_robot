@@ -21,7 +21,7 @@ LED_OFF = 0
 
 OPERATE_MODE_ADD_LEN = (11, 1)
 
-class DXL_Conmunication(object):
+class DXL_Communication(object):
     def __init__(self, device_name = '/dev/ttyUSB0', b_rate=3000000, log_level="info", log_file_level="debug"):
         self.log_level = log_level
         self.log_file_level = log_file_level
@@ -213,7 +213,7 @@ class DXL_motor(object):
 
         # Control table address
         self.log = log.LogHandler(
-            DXL_Conmunication.__name__ + " ." + self.__class__.__name__ + f"_{Motor_number}",
+            DXL_Communication.__name__ + " ." + self.__class__.__name__ + f"_{Motor_number}",
             __name__,
             log_level,
             file_log_level
@@ -586,7 +586,7 @@ class MyGroupBucketRead(dxlSDK.GroupBulkRead):
 
 def readError():
     import time
-    dynamixel = DXL_Conmunication("/dev/tty.usbserial-FT2N0CMQ")
+    dynamixel = DXL_Communication("/dev/tty.usbserial-FT2N0CMQ")
     # dynamixel = DXL_Conmunication()
     upper_motor = dynamixel.createMotor("upper_motor",1)
     upper_motor.readHardwareError()
@@ -596,7 +596,7 @@ def readError():
 def torqueTest():
     #Show the current reading at pos 2120 when twisting the motor
     
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
     test_motor = dynamixel.createMotor('test_motor', motor_number=1)
     time.sleep(3)
     test_motor.switchMode('position')
@@ -645,7 +645,7 @@ def threeMotorSeedTest():
     import numpy
     #Three motors communication test, shows frequency and each process duration 
 
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
 
 
     motor0 = dynamixel.createMotor('motor0',1)
@@ -689,7 +689,7 @@ def threeMotorSeedTest():
 def posSwipeTest():
     #Show actual speed when three motors is following position cmd
 
-    dynamixel = DXL_Conmunication(DEVICE_NAME,B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME,B_RATE)
 
     middl_motor = dynamixel.createMotor("middl_moter",2)
 
@@ -735,7 +735,7 @@ def velSwipeToTarget():
     #Track position cmd by velocity mode
 
     ID     = 1
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
     test_motor = dynamixel.createMotor('test_motor' ,motor_number=ID)
     dynamixel.activateIndirectMode()
     dynamixel.addAllBuckPrarmeter()
@@ -771,7 +771,7 @@ def velSwipeToTarget():
 def motorVelocityErrorTest():
     #Show the error of constant velocity cmd, Error increase as absolute V_cmd decrease
     ID = 1
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
     motor = dynamixel.createMotor('motor',ID)
     dynamixel.activateIndirectMode()
 
@@ -812,7 +812,7 @@ def SingleMotorTest():
     #show difference between optimized SDK and original SDK
 
     ID = 1
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
     dynamixel.activateDXLConnection()
     motor = dynamixel.createMotor('test', motor_number=ID)
     # dynamixel.activateIndirectMode()
@@ -877,7 +877,7 @@ def MotorReadTest():
     #show difference between optimized SDK and original SDK
 
     ID = 1
-    dynamixel = DXL_Conmunication(DEVICE_NAME, B_RATE)
+    dynamixel = DXL_Communication(DEVICE_NAME, B_RATE)
     dynamixel.activateDXLConnection()
     motor = dynamixel.createMotor('test', motor_number=ID)
     # dynamixel.activateIndirectMode()

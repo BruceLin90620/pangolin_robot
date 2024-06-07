@@ -55,7 +55,7 @@ def control_thread(q):
 
                 # Execute shutdown command with sudo, reading password from stdin
                 sudo_password = "csl92021164"
-                command = "echo {} | sudo -S shutdown -h now".format(sudo_password)
+                command = "echo {} | sudo -S shutdown -h now".format(sudo_password) #TODO -h ??
                 subprocess.Popen(command, shell=True)
                 start_time = None
                 elapsed_time = 0

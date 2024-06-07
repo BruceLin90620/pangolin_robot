@@ -14,7 +14,8 @@ class PangolinConfiguration:
         self.leg_motor_direction = np.array([1, -1, 1, -1]) # 1-2
                                                             # 3-4
 
-        self.leg_center_position = np.array([1535, 2561, 2567, 1525, 2000, 2000, 2000, 2000])
+        self.leg_center_position = np.array([1400, 2675, 2567, 1517, 2000, 2000, 2074, 2040])
+
 
         self.move_forward = 30
         self.move_backward = -30

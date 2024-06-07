@@ -21,8 +21,8 @@ class PangolinGait:
         self.move_forward  = self.pangolin_config.move_forward  * linear_x
         self.move_backward = self.pangolin_config.move_backward * linear_x
 
-        self.turn_forward  = self.pangolin_config.turn_forward  * angular_z
-        self.turn_backward = self.pangolin_config.turn_backward * angular_z
+        self.turn_forward  = self.pangolin_config.turn_forward  * -angular_z
+        self.turn_backward = self.pangolin_config.turn_backward * -angular_z
 
         self.set_gait_dic()
 

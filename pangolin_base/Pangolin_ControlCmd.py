@@ -32,6 +32,7 @@ class PangolinControl:
     def __del__(self): # Called when object is deleted
         self.stop_gait()
 
+    
     def cleanup(self): # Ensures both high and low-level objects are cleaned up
         self.__del__()
         self.control_cmd.cleanup() 
@@ -47,42 +48,47 @@ class PangolinControl:
     def process_gait(self):
         """Executes the selected gait pattern."""
 
-        self.set_gait_name('turn_right')
+        # self.set_gait_name('turn_right')
 
         if self.gait_name == 'move_linear':
             while True:
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+                if self.is_walking == False: break
+                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
 
-                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                        if self.is_walking == False: break
+                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                    if self.is_walking == False: break
 
-                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                        self.control_cmd.motor_position_control(self.motor_position)
-                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+                    self.spine_position = np.array([41.0, 0]) * self.angular_z #TODO spine control system
+                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                    self.control_cmd.motor_position_control(self.motor_position)
+
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
 
         
         elif self.gait_name == 'turn_right':
             while True:
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+                if self.is_walking == False: break
+                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
 
-                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                        if self.is_walking == False: break
+                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                    if self.is_walking == False: break
 
-                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                        self.control_cmd.motor_position_control(self.motor_position)
-                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                    self.control_cmd.motor_position_control(self.motor_position)
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
 
 
         elif self.gait_name == 'turn_left':
             while True:
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
+                if self.is_walking == False: break
+                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
 
-                    for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                        if self.is_walking == False: break
+                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
+                    if self.is_walking == False: break
 
-                        self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                        self.control_cmd.motor_position_control(self.motor_position)
-                        self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
+                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
+                    self.control_cmd.motor_position_control(self.motor_position)
+                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
 
 
 
@@ -127,6 +133,10 @@ class PangolinControl:
 
         self.gait_name = gait_name
         
+    def set_velocity(self, linear_x = 1.0, angular_z = 1.0):
+        self.linear_x  = linear_x
+        self.angular_z = angular_z
+
     def set_head_position(self):
         pass
 

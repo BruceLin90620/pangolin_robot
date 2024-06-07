@@ -1,11 +1,5 @@
 import numpy as np
 
-leg_forward = 200
-leg_backward = -300 # test 200
-turn_forward = 250
-turn_backward = -250
-
-
 class PangolinConfiguration:
      def __init__(self):
         self.pangolin_height = 95
@@ -16,6 +10,9 @@ class PangolinConfiguration:
         self.W = 92
 
         self.dt = 0.01
+
+        self.leg_motor_direction = np.array([1, -1, 1, -1]) # 1-2
+                                                            # 3-4
 
         self.leg_center_position = np.array([1535, 2561, 2567, 1525, 2000, 2000, 2000, 2000])
 

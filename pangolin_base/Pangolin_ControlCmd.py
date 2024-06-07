@@ -1,26 +1,27 @@
 from DXL_motor_control import DXL_Communication
-import time
-import traceback
-from time import sleep
-import numpy as np
-
 from Pangolin_Config import PangolinConfiguration, PangolinDynamixel
 from Pangolin_Gait import PangolinGait
 
+import numpy as np
+import time
+import traceback
 import atexit
 import threading
+
+
 
 class PangolinControl:
     """High-level control of the Pangolin robot."""
     def __init__(self):
 
         self.control_cmd = ControlCmd()
-        pangolin_config = PangolinConfiguration()
+        self.pangolin_config = PangolinConfiguration()
         self.pangolin_gait = PangolinGait()
 
         self.is_walking = False # Flag to indicate if the robot is walking
 
-        self.leg_center_position = pangolin_config.leg_center_position
+        self.leg_center_position = self.pangolin_config.leg_center_position
+
         self.motor_position = np.zeros(8) 
         self.head_position  = np.zeros(2)
         self.spine_position = np.zeros(2)
@@ -47,7 +48,6 @@ class PangolinControl:
         """Executes the selected gait pattern."""
 
         self.set_gait_name('turn_right')
-        self.pangolin_gait.set_gait_dic()  # Initialize the gait dictionary
 
         if self.gait_name == 'move_linear':
             while True:
@@ -89,10 +89,9 @@ class PangolinControl:
     def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 
         """Converts desired joint angles into raw motor positions."""
 
-        self.motor_position = np.zeros(8)
-        direction = np.array([1, -1, 1, -1])
+        
 
-        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(direction) + self.leg_center_position[:4]
+        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(self.pangolin_config.leg_motor_direction) + self.leg_center_position[:4]
 
         self.motor_position[:4] = leg_motor_pos
 
@@ -172,7 +171,7 @@ class ControlCmd:
         self.walking_freq = pangolin_config.dt*1000
 
         #check list
-        self.joint_position = []
+        self.joint_position = np.zeros(8)
 
     def __del__(self): # Disable motors on object deletion
         self.disable_all_motor()
@@ -180,8 +179,6 @@ class ControlCmd:
     # Extends the cleanup process to close the communication handler
     def cleanup(self): 
         self.__del__()
-        self.dynamixel.closeHandler()
-
         
     def enable_all_motor(self):
         for motor in self.leg_motor_list:
@@ -201,7 +198,7 @@ class ControlCmd:
         for motor in self.spine_motor_list:
             motor.disableMotor()
 
-        # self.dynamixel.closeHandler()
+        self.dynamixel.closeHandler()
     
     # Read all the motors data
     def read_all_motor_data(self):
@@ -210,14 +207,17 @@ class ControlCmd:
 
     # Update all the motors data
     def update_joint_state(self):
+        motor_id = 0
         self.dynamixel.updateMotorData()
-        self.joint_position = []
         for motor in self.leg_motor_list:
-            self.joint_position.append(motor.PRESENT_POSITION_value)
+            self.joint_position[motor_id] = motor.PRESENT_POSITION_value
+            motor_id += 1
         for motor in self.head_motor_list:
-            self.joint_position.append(motor.PRESENT_POSITION_value)
+            self.joint_position[motor_id] = motor.PRESENT_POSITION_value
+            motor_id += 1
         for motor in self.spine_motor_list:
-            self.joint_position.append(motor.PRESENT_POSITION_value)
+            self.joint_position[motor_id] = motor.PRESENT_POSITION_value
+            motor_id += 1
 
     # Control all motors position
     def motor_position_control(self, position: np.array):

@@ -4,7 +4,7 @@ from Pangolin_Config import PangolinConfiguration
 class PangolinGait:
     def __init__(self):
         """Initialize the gait generator with default values from configuration."""
-        
+
         self.pangolin_config = PangolinConfiguration()
         self.move_forward  = self.pangolin_config.move_forward
         self.move_backward = self.pangolin_config.move_backward
@@ -12,7 +12,7 @@ class PangolinGait:
         self.turn_forward  = self.pangolin_config.turn_forward
         self.turn_backward = self.pangolin_config.turn_backward
 
-        self.set_gait_dic()
+        self.set_gait_dic() # Initialize the gait dictionary
 
         
     def calculate_gait(self, linear_x: float , angular_z: float):

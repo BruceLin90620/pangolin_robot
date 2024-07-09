@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="pangolin_urdf_20240701">
+
+  <link name="base_footprint" />
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint" />
+    <child link="base_link" />
+  </joint>
+
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.0313252257898107 -0.00588480632921573 -3.84345790439118E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.300656161499489" />
+      <inertia
+        ixx="0.000301845059404825"
+        ixy="-8.25487597276206E-06"
+        ixz="8.6011437382888E-07"
+        iyy="0.00064795051300159"
+        iyz="3.24091887376188E-06"
+        izz="0.00041939065914618" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link
+    name="middle_Link">
+    <inertial>
+      <origin
+        xyz="-0.0119998076419855 0.000631330580425379 -0.000631413846928882"
+        rpy="0 0 0" />
+      <mass
+        value="0.0516800335523288" />
+      <inertia
+        ixx="1.00735501847802E-05"
+        ixy="7.6612843438481E-10"
+        ixz="8.64529927359661E-10"
+        iyy="1.42015051482129E-05"
+        iyz="-3.44213547772831E-07"
+        izz="1.42013923449279E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/middle_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/middle_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="middle_joint"
+    type="continuous">
+    <origin
+      xyz="-0.123545725760119 0 -0.0143999999999989"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="middle_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="backbody_Link">
+    <inertial>
+      <origin
+        xyz="-0.0401345285360247 0.00150404730811935 -1.3639891432567E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.133315232250175" />
+      <inertia
+        ixx="6.22929555065092E-05"
+        ixy="1.62167177106984E-06"
+        ixz="3.86479180915062E-11"
+        iyy="9.66506714262623E-05"
+        iyz="7.13313887467718E-11"
+        izz="5.1414766900231E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/backbody_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/backbody_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="backbody_joint"
+    type="continuous">
+    <origin
+      xyz="-0.024 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="middle_Link" />
+    <child
+      link="backbody_Link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="lb_Link">
+    <inertial>
+      <origin
+        xyz="0.0113504180177432 -0.0399853221348838 -0.0119460436137977"
+        rpy="0 0 0" />
+      <mass
+        value="0.0475589041979298" />
+      <inertia
+        ixx="1.22866571038927E-05"
+        ixy="3.48861163975532E-06"
+        ixz="1.68183314167486E-07"
+        iyy="8.15609817415042E-06"
+        iyz="-1.99134224252012E-07"
+        izz="1.83443674686508E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/lb_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/lb_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lb_joint"
+    type="continuous">
+    <origin
+      xyz="-0.055701668245708 0.00208974071687983 -0.0523614811329661"
+      rpy="0 0 0" />
+    <parent
+      link="backbody_Link" />
+    <child
+      link="lb_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rb_Link">
+    <inertial>
+      <origin
+        xyz="0.0113509950048316 -0.0399870419066324 0.0119459438895403"
+        rpy="0 0 0" />
+      <mass
+        value="0.0475552016041672" />
+      <inertia
+        ixx="1.22854639114743E-05"
+        ixy="3.48743484174202E-06"
+        ixz="-1.68034498691331E-07"
+        iyy="8.15619442296004E-06"
+        iyz="1.99522558191507E-07"
+        izz="1.83435666794323E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/rb_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/rb_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rb_link"
+    type="continuous">
+    <origin
+      xyz="-0.055701668245708 0.00208974071688019 0.0523614811329654"
+      rpy="0 0 0" />
+    <parent
+      link="backbody_Link" />
+    <child
+      link="rb_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="camera_link" >
+    <inertial>
+      <origin
+        xyz="-0.102101122959353 -0.0717874762493328 -0.00015491888935903"
+        rpy="1.5707963267949 -1.5707963267949 1.5707963267949"/>
+      <mass
+        value="0.731144835838278" />
+      <inertia
+        ixx="0.00211232176175049"
+        ixy="-0.000355381820260514"
+        ixz="4.5225371271479E-06"
+        iyy="0.00752084535692437"
+        iyz="4.91188148074784E-06"
+        izz="0.00700137458721693" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 -1.5707963267949 1.5707963267949" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/cam_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 -1.5707963267949 1.5707963267949" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/cam_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="cam_joint"
+    type="fixed">
+    <origin
+      xyz="0.0257215676729172 -4.25630967756469E-05 0.0528721377651949"
+      rpy="1.5707963267949 3.141592654 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="camera_link" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="head_Link">
+    <inertial>
+      <origin
+        xyz="0.0120001788552717 0.0063368437491022 -0.000686894766789261"
+        rpy="0 0 0" />
+      <mass
+        value="0.0552741565417432" />
+      <inertia
+        ixx="1.01840741099191E-05"
+        ixy="7.88264580287448E-10"
+        ixz="8.69204342502577E-10"
+        iyy="1.4362803460138E-05"
+        iyz="-3.44212189343135E-07"
+        izz="1.43626696065816E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/head_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/head_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="head_joint"
+    type="continuous">
+    <origin
+      xyz="0.0467638235284072 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="head_Link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="lf_Link">
+    <inertial>
+      <origin
+        xyz="-0.011350825105683 -0.0399869970241528 -0.0119459873978943"
+        rpy="0 0 0" />
+      <mass
+        value="0.0475547576628768" />
+      <inertia
+        ixx="1.22852806516265E-05"
+        ixy="-3.48733745908031E-06"
+        ixz="-1.68043402088699E-07"
+        iyy="8.15603075387336E-06"
+        iyz="-1.99495089301054E-07"
+        izz="1.83432420449524E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/lf_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/lf_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lf_joint"
+    type="continuous">
+    <origin
+      xyz="0.0176840717973532 0.0523614817993116 -0.0126500000000018"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="lf_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rf_Link">
+    <inertial>
+      <origin
+        xyz="-0.0113503533609668 -0.0399853667899525 0.0119460274743158"
+        rpy="0 0 0" />
+      <mass
+        value="0.0475588832380788" />
+      <inertia
+        ixx="1.22866685320894E-05"
+        ixy="-3.48851782212338E-06"
+        ixz="1.68177548162429E-07"
+        iyy="8.15605228859428E-06"
+        iyz="1.99134462034751E-07"
+        izz="1.83443336774412E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/rf_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pangolin_description/meshes/rf_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rf_joint"
+    type="continuous">
+    <origin
+      xyz="0.0176840717973532 -0.0523614817993125 -0.0126500000000018"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rf_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+
+</robot>

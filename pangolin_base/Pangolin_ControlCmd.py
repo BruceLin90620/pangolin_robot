@@ -1,6 +1,7 @@
 from DXL_motor_control import DXL_Communication
-from Pangolin_Config import PangolinConfiguration, PangolinDynamixel
+from Pangolin_Config import PangolinConfiguration, PangolinDynamixel, Vel, Vector3
 from Pangolin_Gait import PangolinGait
+from Pangolin_Kinematic import PangolinKinematic
 
 import numpy as np
 import time
@@ -14,20 +15,20 @@ class PangolinControl:
     """High-level control of the Pangolin robot."""
     def __init__(self):
 
+        self.req_vel = Vel(linear= Vector3(x=0.0, y=0.0, z=0.0), angular=Vector3(x=0.0, y=0.0, z=0.0))
         self.control_cmd = ControlCmd()
         self.pangolin_config = PangolinConfiguration()
         self.pangolin_gait = PangolinGait()
+        self.pangolin_kinematic = PangolinKinematic()
 
         self.is_walking = False # Flag to indicate if the robot is walking
 
         self.leg_center_position = self.pangolin_config.leg_center_position
 
         self.motor_position = np.zeros(8) 
-        self.head_position  = np.zeros(2)
-        self.spine_position = np.zeros(2)
 
-        self.linear_x = 1.0
-        self.angular_z = 1.0
+        self.gait_name = 'move_linear'
+
 
     def __del__(self): # Called when object is deleted
         self.stop_gait()
@@ -41,63 +42,32 @@ class PangolinControl:
     def reset_to_orginal(self): 
         """Resets the robot to its default pose."""
 
-        self.angle_to_servo(np.zeros(4), self.head_position, self.spine_position)
+        self.angle_to_servo(np.zeros(4), np.zeros(2), np.zeros(2))
         self.control_cmd.motor_position_control(self.motor_position)
 
 
     def process_gait(self):
         """Executes the selected gait pattern."""
 
-        # self.set_gait_name('turn_right')
+        gait_num = 0
+        while self.is_walking == True:
+            
+            gait = self.pangolin_gait.gait_dic[self.gait_name]
+            if gait_num >= len(gait): gait_num = 0
+            leg_gait_position = gait[gait_num]
+            gait_num += 1
+            
+            leg_angle, head_angle, spine_angle = self.pangolin_kinematic.calculate_joint(self.gait_name, leg_gait_position, self.req_vel)
+            motor_position = self.angle_to_servo(leg_angle, head_angle, spine_angle)
+            self.control_cmd.motor_position_control(motor_position)
 
-        if self.gait_name == 'move_linear':
-            while True:
-                if self.is_walking == False: break
-                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
-
-                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                    if self.is_walking == False: break
-
-                    self.spine_position = np.array([41.0, 0]) * self.angular_z #TODO spine control system
-                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                    self.control_cmd.motor_position_control(self.motor_position)
-
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
-
-        
-        elif self.gait_name == 'turn_right':
-            while True:
-                if self.is_walking == False: break
-                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
-
-                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                    if self.is_walking == False: break
-
-                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                    self.control_cmd.motor_position_control(self.motor_position)
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
-
-
-        elif self.gait_name == 'turn_left':
-            while True:
-                if self.is_walking == False: break
-                self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z) # Calculate the gait based on velocities
-
-                for leg_position in self.pangolin_gait.gait_dic[self.gait_name]:
-                    if self.is_walking == False: break
-
-                    self.angle_to_servo(np.array(leg_position), self.head_position, self.spine_position)
-                    self.control_cmd.motor_position_control(self.motor_position)
-                    self.pangolin_gait.calculate_gait(self.linear_x, self.angular_z)
-
+            
 
 
     def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 
         """Converts desired joint angles into raw motor positions."""
 
-        
-
-        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(self.pangolin_config.leg_motor_direction) + self.leg_center_position[:4]
+        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(self.pangolin_config.leg_motor_direction) + self.leg_center_position[:4] #TODO　4095/360 to constant
 
         self.motor_position[:4] = leg_motor_pos
 
@@ -107,7 +77,7 @@ class PangolinControl:
         spine_motor_pos = spine_motor_angle*(4095/360) + self.leg_center_position[6:8]
         self.motor_position[6:8] = spine_motor_pos
 
-        # print(self.motor_position)
+        return self.motor_position
 
 
     def start_gait(self):
@@ -133,9 +103,9 @@ class PangolinControl:
 
         self.gait_name = gait_name
         
-    def set_velocity(self, linear_x = 1.0, angular_z = 1.0):
-        self.linear_x  = linear_x
-        self.angular_z = angular_z
+    def set_velocity(self, cmd_vel):
+        self.req_vel.linear.x  = cmd_vel.linear.x
+        self.req_vel.angular.z = cmd_vel.angular.z
 
     def set_head_position(self):
         pass

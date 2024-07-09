@@ -1,0 +1,4 @@
+# Dictionary with tag poses: [x, y, z, Roll, Pitch, Yaw] (meters, radians)
+
+tag_info:
+  0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

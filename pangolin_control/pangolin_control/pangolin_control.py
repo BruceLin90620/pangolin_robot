@@ -67,34 +67,33 @@ class Pangolin(Node):
 
 # Pangolin cmd_vel callback
     def cmd_vel_callback(self, msg):
-        
-        self.control_cmd.set_velocity(msg.linear.x, msg.angular.z)
+        # if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
+        #     msg.linear.x = 1.0
 
-        if round(msg.linear.x, 0) != 0:
-            
+
+        self.control_cmd.set_velocity(msg)
+
+        if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
             if self.control_cmd.is_walking == False:
+                self.control_cmd.start_gait()
+
+            if round(msg.linear.x, 1) != 0:
                 self.get_logger().info(f'cmd_vel linear')
                 self.control_cmd.set_gait_name('move_linear')
-                self.control_cmd.start_gait()
-
-        elif round(msg.angular.z, 0) < 0:
-
-            if self.control_cmd.is_walking == False:
+                
+            elif round(msg.angular.z, 1) < 0:
                 self.get_logger().info(f'cmd_vel turn_right')
                 self.control_cmd.set_gait_name('turn_right')
-                self.control_cmd.start_gait()
 
-        elif round(msg.angular.z, 0) > 0:
-            
-            if self.control_cmd.is_walking == False:
+            elif round(msg.angular.z, 1) > 0:
                 self.get_logger().info(f'cmd_vel turn_left')
                 self.control_cmd.set_gait_name('turn_left')
-                self.control_cmd.start_gait()
-        
+
         else:
             if self.control_cmd.is_walking == True:
+                self.get_logger().info(f'stop')
                 self.control_cmd.stop_gait()
-        
+
         
 
             

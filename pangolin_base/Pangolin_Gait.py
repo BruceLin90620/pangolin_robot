@@ -14,17 +14,6 @@ class PangolinGait:
 
         self.set_gait_dic() # Initialize the gait dictionary
 
-        
-    def calculate_gait(self, linear_x: float , angular_z: float):
-        """Dynamically adjust the gait based on linear and angular velocity."""
-                
-        self.move_forward  = self.pangolin_config.move_forward  * linear_x
-        self.move_backward = self.pangolin_config.move_backward * linear_x
-
-        self.turn_forward  = self.pangolin_config.turn_forward  * -angular_z
-        self.turn_backward = self.pangolin_config.turn_backward * -angular_z
-
-        self.set_gait_dic()
 
     def set_gait_dic(self):
         """A dictionary for gait patterns."""

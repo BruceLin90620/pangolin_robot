@@ -5,7 +5,7 @@ teleop_twist_joy_node:
       y: 2
       z: 5
     scale_linear:
-      x: 1.0
+      x: 2.2
       y: 1.0
       z: 1.0
     scale_linear_turbo:

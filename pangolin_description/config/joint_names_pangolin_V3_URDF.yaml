@@ -1,0 +1,1 @@
+controller_joint_names: ['', 'Head_Link', 'LFleg_Link', 'RFleg_Link', 'BodyMotor_Link', 'BackBody_Link', 'LBleg_Link', 'RBleg_Link', ]

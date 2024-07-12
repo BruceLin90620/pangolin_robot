@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'apriltag_localize'
+package_name = 'nav2_vslam_localize'
 
 setup(
     name=package_name,
@@ -23,7 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'apriltag_localization_node = apriltag_localize.apriltag_localization:main'
+            'vslam_init_pose_node = nav2_vslam_localize.vslam_init_pose_node:main'
         ],
     },
 )

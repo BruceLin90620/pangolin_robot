@@ -97,7 +97,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value="/home/pangolin/pangolin_ws/pangolin_robot/pangolin_navigation/map/csl_map.yaml",
+        default_value="/home/pangolin/pangolin_ws/src/pangolin_robot/pangolin_navigation/map/csl_map.yaml",
         description='Full path to map yaml file to load')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(

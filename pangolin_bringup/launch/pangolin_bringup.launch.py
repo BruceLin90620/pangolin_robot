@@ -13,6 +13,7 @@ def generate_launch_description():
     fdlink_ahrs_dir = FindPackageShare('fdlink_ahrs')
     isaac_ros_visual_slam_dir = FindPackageShare('pangolin_isaac_ros_visual_slam')
     isaac_ros_apriltag_dir = FindPackageShare('pangolin_isaac_ros_apriltag')
+    apriltag_localize_dir = FindPackageShare('apriltag_localize')
     nav2_vslam_localize_dir = FindPackageShare('nav2_vslam_localize')
     navigation_dir = FindPackageShare('pangolin_navigation')
     map_yaml_file = LaunchConfiguration('map')
@@ -34,6 +35,11 @@ def generate_launch_description():
     isaac_ros_apriltag_launch = PathJoinSubstitution(
         [isaac_ros_apriltag_dir, 'launch', 'isaac_ros_apriltag_realsense.launch.py']
     )
+
+    apriltag_localize_launch = PathJoinSubstitution(
+        [apriltag_localize_dir, 'launch', 'apriltag_localize.launch.py']
+    )
+
     nav2_vslam_localize_launch = PathJoinSubstitution(
         [nav2_vslam_localize_dir, 'launch', 'nav2_vslam_localize.launch.py']
     )
@@ -43,29 +49,32 @@ def generate_launch_description():
 
     def launch_setup(context, *args, **kwargs):
         return [
-            # IncludeLaunchDescription(
-            #     PythonLaunchDescriptionSource(pangolin_control_launch)
-            # ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(pangolin_control_launch)
+            ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(pangolin_state_publisher_launch)
             ),
             # IncludeLaunchDescription(
             #     PythonLaunchDescriptionSource(ahrs_driver_launch)
             # ),
-            # IncludeLaunchDescription(
-            #     PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch)
-            # ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch)
+            ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(isaac_ros_apriltag_launch)
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(apriltag_localize_launch)
             ),
             # IncludeLaunchDescription(
             #     PythonLaunchDescriptionSource(nav2_vslam_localize_launch)
             # ),
-            Node(
-                package='teleop_twist_keyboard', 
-                executable='teleop_twist_keyboard',
-                name='teleop_twist_keyboard_node', 
-            ),
+            # Node(
+            #     package='teleop_twist_keyboard', 
+            #     executable='teleop_twist_keyboard',
+            #     name='teleop_twist_keyboard_node', 
+            # ),
 
             # 使用 TimerAction 延遲導航啟動
             TimerAction(

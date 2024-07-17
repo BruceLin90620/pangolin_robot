@@ -30,14 +30,23 @@ class PangolinKinematic:
 
     def leg_controller(self):
         """ Calculates leg angles based on the current gait and desired velocity. """
+        if self.req_vel.linear.x > 0.1: self.req_vel.linear.x = 1.0
+        elif self.req_vel.linear.x < -0.1: self.req_vel.linear.x = -1.0
 
         if self.gait_name == 'move_linear':
-            leg_angle = np.array(self.leg_position) * self.req_vel.linear.x / self.pangolin_config.max_linear_vel
+            leg_angle = np.array(self.leg_position) * self.req_vel.linear.x
+            # leg_angle = np.array(self.leg_position) * self.req_vel.linear.x / self.pangolin_config.max_linear_vel
 
         elif self.gait_name == 'turn_left':
+            if self.req_vel.angular.z > 0.0: self.req_vel.angular.z = 1.0
+            elif self.req_vel.angular.z < -0.0: self.req_vel.angular.z = -1.0
+
             leg_angle = np.array(self.leg_position) * -self.req_vel.angular.z
 
         elif self.gait_name == 'turn_right':
+            if self.req_vel.angular.z > 0.0: self.req_vel.angular.z = 1.0
+            elif self.req_vel.angular.z < -0.0: self.req_vel.angular.z = -1.0
+        
             leg_angle = np.array(self.leg_position) * self.req_vel.angular.z
 
         return leg_angle

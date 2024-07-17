@@ -24,12 +24,11 @@ class PangolinConfiguration:
 
         self.move_forward = 20
         self.move_backward = -20
-        self.turn_forward = 30
-        self.turn_backward = -30
+        self.turn_forward = 20
+        self.turn_backward = -20
 
-        self.max_linear_vel = self.leg_length * 0.001 * np.sin(np.deg2rad(self.move_forward)) * 2/3 / self.dt
+        self.max_linear_vel = self.leg_length * 0.001 *0.001 * np.sin(np.deg2rad(self.move_forward)) * 2/3 / self.dt #0.00216 m/s
         
-        print(self.max_linear_vel)
 class PangolinDynamixel:
     def __init__(self):
         self.DEVICE_NAME = "/dev/ttyUSB0"

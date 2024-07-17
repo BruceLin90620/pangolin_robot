@@ -9,7 +9,7 @@ import traceback
 import atexit
 import threading
 
-
+DEGREE_TO_SERVO = 4095/360
 
 class PangolinControl:
     """High-level control of the Pangolin robot."""
@@ -67,14 +67,14 @@ class PangolinControl:
     def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 
         """Converts desired joint angles into raw motor positions."""
 
-        leg_motor_pos = leg_motor_angle*(4095/360)*np.transpose(self.pangolin_config.leg_motor_direction) + self.leg_center_position[:4] #TODO　4095/360 to constant
+        leg_motor_pos = leg_motor_angle*DEGREE_TO_SERVO*np.transpose(self.pangolin_config.leg_motor_direction) + self.leg_center_position[:4] #TODO　4095/360 to constant
 
         self.motor_position[:4] = leg_motor_pos
 
-        head_motor_pos = head_motor_angle*(4095/360) + self.leg_center_position[4:6]
+        head_motor_pos = head_motor_angle*DEGREE_TO_SERVO + self.leg_center_position[4:6]
         self.motor_position[4:6] = head_motor_pos
 
-        spine_motor_pos = spine_motor_angle*(4095/360) + self.leg_center_position[6:8]
+        spine_motor_pos = spine_motor_angle*DEGREE_TO_SERVO + self.leg_center_position[6:8]
         self.motor_position[6:8] = spine_motor_pos
 
         return self.motor_position

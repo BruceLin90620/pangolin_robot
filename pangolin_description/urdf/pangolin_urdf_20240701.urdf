@@ -54,7 +54,7 @@
   </link>
 
   <link
-    name="middle_link">
+    name="middle_Link">
     <inertial>
       <origin
         xyz="-0.0119998076419855 0.000631330580425379 -0.000631413846928882"
@@ -102,12 +102,12 @@
     <parent
       link="base_link" />
     <child
-      link="middle_link" />
+      link="middle_Link" />
     <axis
       xyz="0 0 1" />
   </joint>
   <link
-    name="backbody_link">
+    name="backbody_Link">
     <inertial>
       <origin
         xyz="-0.0401345285360247 0.00150404730811935 -1.3639891432567E-07"
@@ -153,9 +153,9 @@
       xyz="-0.024 0 0"
       rpy="0 0 0" />
     <parent
-      link="middle_link" />
+      link="middle_Link" />
     <child
-      link="backbody_link" />
+      link="backbody_Link" />
     <axis
       xyz="0 1 0" />
   </joint>
@@ -213,7 +213,7 @@
       xyz="0 0 1" />
   </joint>
   <link
-    name="rb_link">
+    name="rb_Link">
     <inertial>
       <origin
         xyz="0.0113509950048316 -0.0399870419066324 0.0119459438895403"
@@ -253,15 +253,15 @@
     </collision>
   </link>
   <joint
-    name="rb_joint"
+    name="rb_link"
     type="continuous">
     <origin
       xyz="-0.055701668245708 0.00208974071688019 0.0523614811329654"
       rpy="0 0 0" />
     <parent
-      link="backbody_link" />
+      link="backbody_Link" />
     <child
-      link="rb_link" />
+      link="rb_Link" />
     <axis
       xyz="0 0 1" />
   </joint>
@@ -319,7 +319,7 @@
       xyz="1 0 0" />
   </joint>
   <link
-    name="head_link">
+    name="head_Link">
     <inertial>
       <origin
         xyz="0.0120001788552717 0.0063368437491022 -0.000686894766789261"
@@ -367,12 +367,12 @@
     <parent
       link="base_link" />
     <child
-      link="head_link" />
+      link="head_Link" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="lf_link">
+    name="lf_Link">
     <inertial>
       <origin
         xyz="-0.011350825105683 -0.0399869970241528 -0.0119459873978943"
@@ -425,7 +425,7 @@
       xyz="0 0 1" />
   </joint>
   <link
-    name="rf_link">
+    name="rf_Link">
     <inertial>
       <origin
         xyz="-0.0113503533609668 -0.0399853667899525 0.0119460274743158"
@@ -473,7 +473,7 @@
     <parent
       link="base_link" />
     <child
-      link="rf_link" />
+      link="rf_Link" />
     <axis
       xyz="0 0 1" />
   </joint>

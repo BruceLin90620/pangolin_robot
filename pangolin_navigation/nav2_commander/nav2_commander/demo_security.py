@@ -92,7 +92,7 @@ def main():
                     navigator.cancelTask()
 
         # If at end of route, reverse the route to restart
-        # security_route.reverse()
+        security_route.reverse()
 
         result = navigator.getResult()
         if result == TaskResult.SUCCEEDED:

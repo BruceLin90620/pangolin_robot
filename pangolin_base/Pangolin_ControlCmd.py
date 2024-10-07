@@ -51,14 +51,15 @@ class PangolinControl:
 
         gait_num = 0
         while self.is_walking == True:
-            
+            print("walking")
             gait = self.pangolin_gait.gait_dic[self.gait_name]
             if gait_num >= len(gait): gait_num = 0
             leg_gait_position = gait[gait_num]
             gait_num += 1
-            
             leg_angle, head_angle, spine_angle = self.pangolin_kinematic.calculate_joint(self.gait_name, leg_gait_position, self.req_vel)
+            
             motor_position = self.angle_to_servo(leg_angle, head_angle, spine_angle)
+            # print(motor_position)
             self.control_cmd.motor_position_control(motor_position)
 
             
@@ -133,12 +134,11 @@ class ControlCmd:
         head_motor_Y  = self.dynamixel.createMotor('motor5', motor_number=5)
         head_motor_P  = self.dynamixel.createMotor('motor6', motor_number=6)
         spine_motor_Y = self.dynamixel.createMotor('motor7', motor_number=7)
-        spine_motor_P = self.dynamixel.createMotor('motor8', motor_number=8)
  
         #Create the motor list
         self.leg_motor_list     = [leg_motor_FL, leg_motor_FR, leg_motor_HL, leg_motor_HR]
+        self.spine_motor_list   = [spine_motor_Y]
         self.head_motor_list    = [head_motor_Y, head_motor_P]
-        self.spine_motor_list   = [spine_motor_Y, spine_motor_P]
 
         #Reboot and update the state
         self.dynamixel.rebootAllMotor()
@@ -243,6 +243,7 @@ if __name__ == "__main__":
         "move":pangolin_control.start_gait,
         "read":pangolin_control.control_cmd.read_all_motor_data,
         "pos":pangolin_control.control_cmd.motor_position_control,
+        "reset":pangolin_control.reset_to_orginal,
     }
 
     atexit.register(pangolin_control.cleanup)

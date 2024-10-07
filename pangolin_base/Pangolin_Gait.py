@@ -15,6 +15,7 @@ class PangolinGait:
         self.set_gait_dic() # Initialize the gait dictionary
 
 
+
     def set_gait_dic(self):
         """A dictionary for gait patterns."""
 

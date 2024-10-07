@@ -17,7 +17,7 @@ def generate_launch_description():
         package="fdlink_ahrs",
         executable="ahrs_driver_node",
         parameters=[{'if_debug': False,
-            'serial_port':'/dev/ttyUSB1',
+            'serial_port':'/dev/ttyIMU',
             'serial_baud':921600,
             'imu_topic':'/imu',
             'imu_frame_id':'imu_link',

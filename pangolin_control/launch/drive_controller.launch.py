@@ -7,7 +7,13 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+import launch
+import launch_ros.actions
+
 def generate_launch_description():
+    # joy_config = launch.substitutions.LaunchConfiguration('joy_config')
+    # joy_dev = launch.substitutions.LaunchConfiguration('joy_dev')
+    # config_filepath = launch.substitutions.LaunchConfiguration('config_filepath')
 
     return LaunchDescription([
         # # Declare launch arguments
@@ -36,6 +42,12 @@ def generate_launch_description():
             name='pangolin_control',
             output='screen'
         ),
+        # launch_ros.actions.Node(
+        #     package='teleop_twist_keyboard', 
+        #     executable='teleop_node',
+        #     name='teleop_twist_keyboard_node', 
+        #     parameters=[config_filepath]
+        # ),
         # Node(
         #     package='pangolin_control',
         #     executable='pangolin_action',

@@ -8,7 +8,7 @@ sudo bash -c "cat > $UDEV_RULE_FILE" <<EOL
 # Udev rules for USB Serial Devices
 
 # FT232H Device
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", ATTRS{serial}=="FT3M9ME3" SYMLINK+="ttyDynamixel"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014",ATTRS{serial}=="FT8J0QYS" SYMLINK+="ttyDynamixel"
 
 # CP210x UART Bridge
 SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60",ATTRS{serial}=="0001" SYMLINK+="ttyIMU"

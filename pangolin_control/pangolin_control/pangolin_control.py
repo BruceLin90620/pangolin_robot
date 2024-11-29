@@ -11,7 +11,7 @@ import time
 import os, sys, math
 import numpy as np
 
-sys.path.append('/home/pangolin/pangolin_ws/pangolin_robot/pangolin_base')
+sys.path.append('/home/pangolin/pangolin_ws/src/pangolin_robot/pangolin_base')
 
 from Pangolin_ControlCmd import PangolinControl
 from Pangolin_ControlCmd import ControlCmd
@@ -67,8 +67,9 @@ class Pangolin(Node):
 
 # Pangolin cmd_vel callback
     def cmd_vel_callback(self, msg):
-        # if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
-        #     msg.linear.x = 1.0
+        # pass
+        if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
+            msg.linear.x = 1.0
 
 
         self.control_cmd.set_velocity(msg)
@@ -76,6 +77,7 @@ class Pangolin(Node):
         if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
             if self.control_cmd.is_walking == False:
                 self.control_cmd.start_gait()
+                self.get_logger().info(f'start_gait')
 
             if round(msg.linear.x, 1) != 0:
                 self.get_logger().info(f'cmd_vel linear')

@@ -25,7 +25,7 @@ setup(
         'console_scripts': [
             'pangolin_control = pangolin_control.pangolin_control:main',
             # 'pangolin_action = pangolin_control.pangolin_control_action:main',
-            'pangolin_imu = pangolin_control.pangolin_imu:main'
+            'pangolin_state = pangolin_control.pangolin_state:main'
         ],
     },
 )

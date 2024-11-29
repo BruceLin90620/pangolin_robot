@@ -1,0 +1,48 @@
+[2024-08-08 09:30:35,690] [DXL_Communication] [ERROR]: activateDXLConnection : 
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/pyserial-3.5-py3.10.egg/serial/serialposix.py", line 322, in open
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+PermissionError: [Errno 13] Permission denied: '/dev/ttyUSB0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pangolin/pangolin_ws/src/pangolin_robot/pangolin_base/DXL_motor_control.py", line 46, in activateDXLConnection
+    if self.port_handler.openPort():
+  File "/usr/local/lib/python3.10/dist-packages/dynamixel_sdk-3.7.51-py3.10.egg/dynamixel_sdk/port_handler.py", line 44, in openPort
+    return self.setBaudRate(self.baudrate)
+  File "/usr/local/lib/python3.10/dist-packages/dynamixel_sdk-3.7.51-py3.10.egg/dynamixel_sdk/port_handler.py", line 68, in setBaudRate
+    return self.setupPort(baud)
+  File "/usr/local/lib/python3.10/dist-packages/dynamixel_sdk-3.7.51-py3.10.egg/dynamixel_sdk/port_handler.py", line 114, in setupPort
+    self.ser = serial.Serial(
+  File "/usr/local/lib/python3.10/dist-packages/pyserial-3.5-py3.10.egg/serial/serialutil.py", line 244, in __init__
+    self.open()
+  File "/usr/local/lib/python3.10/dist-packages/pyserial-3.5-py3.10.egg/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 13] could not open port /dev/ttyUSB0: [Errno 13] Permission denied: '/dev/ttyUSB0'
+[2024-08-08 09:30:35,693] [DXL_Communication] [WARNING]: activateDXLConnection : Failed to open the port
+[2024-08-08 09:30:35,693] [DXL_Communication] [WARNING]: activateDXLConnection : System will run WITHOUT Real Mortor
+[2024-11-11 14:01:11,142] [DXL_Communication] [INFO]: activateDXLConnection : Succeeded to open the port
+[2024-11-11 14:01:11,149] [DXL_Communication] [INFO]: activateDXLConnection : Succeeded to change the baudrate
+[2024-11-11 14:01:11,187] [DXL_Communication .DXL_motor_1] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 1
+[2024-11-11 14:01:11,223] [DXL_Communication .DXL_motor_1] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:1
+[2024-11-11 14:01:11,224] [DXL_Communication] [WARNING]: createMotor : Motor 1 connect error
+[2024-11-11 14:01:11,261] [DXL_Communication .DXL_motor_2] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 2
+[2024-11-11 14:01:11,298] [DXL_Communication .DXL_motor_2] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:2
+[2024-11-11 14:01:11,298] [DXL_Communication] [WARNING]: createMotor : Motor 2 connect error
+[2024-11-11 14:01:11,336] [DXL_Communication .DXL_motor_3] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 3
+[2024-11-11 14:01:11,373] [DXL_Communication .DXL_motor_3] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:3
+[2024-11-11 14:01:11,373] [DXL_Communication] [WARNING]: createMotor : Motor 3 connect error
+[2024-11-11 14:01:11,410] [DXL_Communication .DXL_motor_4] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 4
+[2024-11-11 14:01:11,447] [DXL_Communication .DXL_motor_4] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:4
+[2024-11-11 14:01:11,447] [DXL_Communication] [WARNING]: createMotor : Motor 4 connect error
+[2024-11-11 14:01:11,484] [DXL_Communication .DXL_motor_5] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 5
+[2024-11-11 14:01:11,521] [DXL_Communication .DXL_motor_5] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:5
+[2024-11-11 14:01:11,521] [DXL_Communication] [WARNING]: createMotor : Motor 5 connect error
+[2024-11-11 14:01:11,558] [DXL_Communication .DXL_motor_6] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 6
+[2024-11-11 14:01:11,595] [DXL_Communication .DXL_motor_6] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:6
+[2024-11-11 14:01:11,595] [DXL_Communication] [WARNING]: createMotor : Motor 6 connect error
+[2024-11-11 14:01:11,632] [DXL_Communication .DXL_motor_7] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 7
+[2024-11-11 14:01:11,669] [DXL_Communication .DXL_motor_7] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:7
+[2024-11-11 14:01:11,670] [DXL_Communication] [WARNING]: createMotor : Motor 7 connect error
+[2024-11-11 14:01:12,671] [DXL_Communication] [WARNING]: updateMotorData : Failed: [TxRxResult] Protocol does not support this function!

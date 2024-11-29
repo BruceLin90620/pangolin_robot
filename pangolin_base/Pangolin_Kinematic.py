@@ -13,11 +13,14 @@ class PangolinKinematic:
         self.spine_position = np.zeros(2)
         self.leg_position   = np.zeros(4)
 
+<<<<<<< HEAD
         self.spine_speed = 1
         self.spine_speedMax = 0
         self.spine_value = 0
         
 
+=======
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
 
     def calculate_joint(self, gait_name, leg_position, req_vel):
         """ Calculates joint angles for legs, head, and spine based on gait type and desired velocity. """
@@ -37,12 +40,29 @@ class PangolinKinematic:
         """ Calculates leg angles based on the current gait and desired velocity. """
         if self.req_vel.linear.x > 0.1: self.req_vel.linear.x = 1.0
         elif self.req_vel.linear.x < -0.1: self.req_vel.linear.x = -1.0
+<<<<<<< HEAD
         
         print("gait_name",self.gait_name)
         
         if self.gait_name == 'move_linear':
             leg_angle = np.array(self.leg_position) * self.req_vel.linear.x
             
+=======
+<<<<<<< Updated upstream
+
+        if self.gait_name == 'move_linear':
+            leg_angle = np.array(self.leg_position) * self.req_vel.linear.x
+            # leg_angle = np.array(self.leg_position) * self.req_vel.linear.x / self.pangolin_config.max_linear_vel
+
+=======
+        
+
+
+        if self.gait_name == 'move_linear':
+            leg_angle = np.array(self.leg_position) * self.req_vel.linear.x
+            
+>>>>>>> Stashed changes
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
         elif self.gait_name == 'turn_left':
             if self.req_vel.angular.z > 0.0: self.req_vel.angular.z = 1.0
             elif self.req_vel.angular.z < -0.0: self.req_vel.angular.z = -1.0
@@ -54,7 +74,10 @@ class PangolinKinematic:
             elif self.req_vel.angular.z < -0.0: self.req_vel.angular.z = -1.0
         
             leg_angle = np.array(self.leg_position) * self.req_vel.angular.z
+<<<<<<< HEAD
             print("leg_angle",leg_angle)
+=======
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
 
         return leg_angle
 
@@ -70,6 +93,7 @@ class PangolinKinematic:
     def spine_controller(self):
         """ Calculates spine angles based on the current gait and desired velocity. """
 
+<<<<<<< HEAD
         if self.gait_name == 'move_linear':            
             if self.req_vel.angular.z == 0:              
                 # Update spine_value using spine_speed incrementally
@@ -102,6 +126,11 @@ class PangolinKinematic:
                 
                 spine_angle = np.array([self.spine_value, 0])
                 print("spine angle (incremental):", spine_angle)
+=======
+        if self.gait_name == 'move_linear':
+            spine_angle = np.array([41.0, 0]) * -self.req_vel.angular.z
+        
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
         else:
             spine_angle = np.zeros(2)
 

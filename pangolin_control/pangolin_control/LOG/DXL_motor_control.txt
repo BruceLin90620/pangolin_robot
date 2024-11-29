@@ -22,6 +22,7 @@ Traceback (most recent call last):
 serial.serialutil.SerialException: [Errno 13] could not open port /dev/ttyUSB0: [Errno 13] Permission denied: '/dev/ttyUSB0'
 [2024-08-08 09:30:35,693] [DXL_Communication] [WARNING]: activateDXLConnection : Failed to open the port
 [2024-08-08 09:30:35,693] [DXL_Communication] [WARNING]: activateDXLConnection : System will run WITHOUT Real Mortor
+<<<<<<< HEAD
 [2024-11-11 14:01:11,142] [DXL_Communication] [INFO]: activateDXLConnection : Succeeded to open the port
 [2024-11-11 14:01:11,149] [DXL_Communication] [INFO]: activateDXLConnection : Succeeded to change the baudrate
 [2024-11-11 14:01:11,187] [DXL_Communication .DXL_motor_1] [INFO]: directReadData : com_err_msg : [TxRxResult] There is no status packet! at ID: 1
@@ -46,3 +47,5 @@ serial.serialutil.SerialException: [Errno 13] could not open port /dev/ttyUSB0: 
 [2024-11-11 14:01:11,669] [DXL_Communication .DXL_motor_7] [INFO]: pingMotor : DXL: Ping Error: [TxRxResult] There is no status packet! at ID:7
 [2024-11-11 14:01:11,670] [DXL_Communication] [WARNING]: createMotor : Motor 7 connect error
 [2024-11-11 14:01:12,671] [DXL_Communication] [WARNING]: updateMotorData : Failed: [TxRxResult] Protocol does not support this function!
+=======
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0

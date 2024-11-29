@@ -54,7 +54,11 @@
   </link>
 
   <link
+<<<<<<< HEAD
     name="middle_Link">
+=======
+    name="middle_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="-0.0119998076419855 0.000631330580425379 -0.000631413846928882"
@@ -102,12 +106,20 @@
     <parent
       link="base_link" />
     <child
+<<<<<<< HEAD
       link="middle_Link" />
+=======
+      link="middle_link" />
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <axis
       xyz="0 0 1" />
   </joint>
   <link
+<<<<<<< HEAD
     name="backbody_Link">
+=======
+    name="backbody_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="-0.0401345285360247 0.00150404730811935 -1.3639891432567E-07"
@@ -153,9 +165,15 @@
       xyz="-0.024 0 0"
       rpy="0 0 0" />
     <parent
+<<<<<<< HEAD
       link="middle_Link" />
     <child
       link="backbody_Link" />
+=======
+      link="middle_link" />
+    <child
+      link="backbody_link" />
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <axis
       xyz="0 1 0" />
   </joint>
@@ -213,7 +231,11 @@
       xyz="0 0 1" />
   </joint>
   <link
+<<<<<<< HEAD
     name="rb_Link">
+=======
+    name="rb_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="0.0113509950048316 -0.0399870419066324 0.0119459438895403"
@@ -253,15 +275,25 @@
     </collision>
   </link>
   <joint
+<<<<<<< HEAD
     name="rb_link"
+=======
+    name="rb_joint"
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     type="continuous">
     <origin
       xyz="-0.055701668245708 0.00208974071688019 0.0523614811329654"
       rpy="0 0 0" />
     <parent
+<<<<<<< HEAD
       link="backbody_Link" />
     <child
       link="rb_Link" />
+=======
+      link="backbody_link" />
+    <child
+      link="rb_link" />
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <axis
       xyz="0 0 1" />
   </joint>
@@ -319,7 +351,11 @@
       xyz="1 0 0" />
   </joint>
   <link
+<<<<<<< HEAD
     name="head_Link">
+=======
+    name="head_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="0.0120001788552717 0.0063368437491022 -0.000686894766789261"
@@ -367,12 +403,20 @@
     <parent
       link="base_link" />
     <child
+<<<<<<< HEAD
       link="head_Link" />
+=======
+      link="head_link" />
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <axis
       xyz="0 1 0" />
   </joint>
   <link
+<<<<<<< HEAD
     name="lf_Link">
+=======
+    name="lf_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="-0.011350825105683 -0.0399869970241528 -0.0119459873978943"
@@ -425,7 +469,11 @@
       xyz="0 0 1" />
   </joint>
   <link
+<<<<<<< HEAD
     name="rf_Link">
+=======
+    name="rf_link">
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <inertial>
       <origin
         xyz="-0.0113503533609668 -0.0399853667899525 0.0119460274743158"
@@ -473,7 +521,11 @@
     <parent
       link="base_link" />
     <child
+<<<<<<< HEAD
       link="rf_Link" />
+=======
+      link="rf_link" />
+>>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
     <axis
       xyz="0 0 1" />
   </joint>

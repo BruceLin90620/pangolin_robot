@@ -1,4 +1,8 @@
 # quadruped_robot_4_DOF
+Developed a biomimetic triceratops robot using ROS2 and computer vision, integrating Realsense D435 camera with Nvidia Isaac ROS VSLAM and AprilTag SLAM for indoor localization, while implementing Nav2 for autonomous navigation capabilities.
+
+<img src="./images/portfolio_triceratops.jpg" width="640px">
+
 ## **Requirements**
 
 - Python 3.10

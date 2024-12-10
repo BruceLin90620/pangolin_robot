@@ -43,11 +43,8 @@ class MPU6050Publisher(Node):
         self.publisher_.publish(self.imu_msg)
 
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
 def main(args=None):
     rclpy.init(args=args)
 

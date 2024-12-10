@@ -25,20 +25,22 @@ class Pangolin(Node):
         self.joy_subscriber_ = self.create_subscription(Joy, 'joy', self.joy_callback, 0)
         self.cmd_vel_subscriber_ = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 1)
         
-        self.is_first_time = True
-        self.is_disalbe_motor = False
-        self.is_freedom_mode = False
-        self.is_stance_mode = False
-        self.is_record_mode = False
-        self.is_sit_mode = False
-        self.is_curl = False
-        self.last_joy_msgs_buttons = []
-        self.time_1 = 0
 
-        #imu
-        self.pitch = None
-        self.roll = None
-        self.yaw = None
+        self.timer = self.create_timer(6.0, self.timer_callback)
+        self.current_motion_index = 0
+        self.motions = [
+            ('turn_left', 1.0, 0.0),
+            ('move_linear', 0.0, 1.0),
+            ('turn_right', -1.0, 0.0),
+            ('move_linear', 0.0, 1.0)
+            
+        ]
+        
+        self.is_first_time = True
+        self.is_random_walk_mode = False
+        self.last_joy_msgs_buttons = []
+
+
 
     # destroy ros    
     def destroy(self):
@@ -46,57 +48,118 @@ class Pangolin(Node):
         self.imu_subscriber_.destroy()
         super().destroy_node()
 
-    
     def joy_callback(self, msg):
-        # X:0, A:1, B:2, Y:3
-        # LB:4, RB:5, LT:6, RT:7
-        # BACK:8, START:9, 
-        # L3:10, R3:11  
+        # X:0, []:3, <|:4, O:1
+        # L1:6, R1:7
+        # L2:5, R2:4 (axes)
+        # Select:10, START:11, 
+        # arrow x 7, arrow y 6（axes）
 
         if self.is_first_time == True:
             self.last_joy_msgs_buttons = msg.buttons
             self.is_first_time = False
 
+        if msg.buttons[10] != self.last_joy_msgs_buttons[10]:
+            self.is_random_walk_mode = not self.is_random_walk_mode
+
         self.last_joy_msgs_buttons = msg.buttons
-        # self.get_logger().info(f'pitch: {self.pitch}')
-        # self.get_logger().info(f'roll: {self.roll}')
-        # self.get_logger().info(f'yaw: {self.yaw}')
+        
+
+    # def cmd_vel_callback(self, msg):
+    #     if not self.is_random_walk_mode:
+    #         if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
+    #             msg.linear.x = 1.0
+
+    #         self.control_cmd.set_velocity(msg)
+    #         self.get_logger().info(f'{self.control_cmd.motor_position}')
+    #         self.get_logger().info(f'{msg.linear.x}')
+    #         self.get_logger().info(f'{msg.angular.z}')
+
+    #         if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0 or round(msg.linear.y, 1)!=0) and msg != None:
+    #             if self.control_cmd.is_walking == False :
+    #                 self.get_logger().info(f'start_gait')
+
+    #             if round(msg.linear.x, 1) != 0:
+    #                 self.get_logger().info(f'cmd_vel linear')
+    #                 self.control_cmd.stop_gait()
+    #                 self.control_cmd.set_gait_name('move_linear')
+    #                 self.control_cmd.start_gait()
+                    
+    #             elif round(msg.angular.z, 1) < 0:
+    #                 self.get_logger().info(f'cmd_vel turn_right')
+    #                 self.control_cmd.stop_gait()
+    #                 self.control_cmd.set_gait_name('turn_right')
+    #                 self.control_cmd.start_gait()
+
+    #             elif round(msg.angular.z, 1) > 0:
+    #                 self.get_logger().info(f'cmd_vel turn_left')
+    #                 self.get_logger().info(f'{msg}')
+    #                 self.control_cmd.stop_gait()
+    #                 self.control_cmd.set_gait_name('turn_left')
+    #                 self.control_cmd.start_gait()
+
+    #         else:
+    #             if self.control_cmd.is_walking == True:
+    #                 self.get_logger().info(f'stop')
+    #                 self.control_cmd.stop_gait()
+
+    def timer_callback(self):
+        
+        if not self.is_random_walk_mode:
+            
+            self.control_cmd.stop_gait()
+            self.control_cmd.start_gait()
+            # 執行當前動作
+            motion_type, angular_z, linear_x = self.motions[self.current_motion_index]
+            msg = Twist()
+            msg.angular.z = angular_z
+            msg.linear.x = linear_x
+            msg.linear.y = 0.0
+
+            self.control_cmd.set_velocity(msg)
+            self.control_cmd.set_gait_name(motion_type)
+            # self.control_cmd.start_gait()
+
+            # 更新到下一個動作
+            self.current_motion_index = (self.current_motion_index + 1) % len(self.motions)
 
 
 
 
-# Pangolin cmd_vel callback
+
     def cmd_vel_callback(self, msg):
-        # pass
         if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
             msg.linear.x = 1.0
 
-
         self.control_cmd.set_velocity(msg)
+        self.get_logger().info(f'self.control_cmd.is_walking: {self.control_cmd.is_walking}')
+        self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
 
-        if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
-            if self.control_cmd.is_walking == False:
-                self.control_cmd.start_gait()
-                self.get_logger().info(f'start_gait')
+        if self.is_random_walk_mode:
+            if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
+                if self.control_cmd.is_walking == False:
+                    self.control_cmd.start_gait()
+                    self.get_logger().info(f'start_gait')
 
-            if round(msg.linear.x, 1) != 0:
-                self.get_logger().info(f'cmd_vel linear')
-                self.control_cmd.set_gait_name('move_linear')
-                
-            elif round(msg.angular.z, 1) < 0:
-                self.get_logger().info(f'cmd_vel turn_right')
-                self.control_cmd.set_gait_name('turn_right')
+                if round(msg.linear.x, 1) != 0:
+                    self.get_logger().info(f'cmd_vel linear')
+                    self.control_cmd.set_gait_name('move_linear')
+                    
+                elif round(msg.angular.z, 1) < 0:
+                    self.get_logger().info(f'cmd_vel turn_right')
+                    self.control_cmd.set_gait_name('turn_right')
 
-            elif round(msg.angular.z, 1) > 0:
-                self.get_logger().info(f'cmd_vel turn_left')
-                self.control_cmd.set_gait_name('turn_left')
+                elif round(msg.angular.z, 1) > 0:
+                    self.get_logger().info(f'cmd_vel turn_left')
+                    self.control_cmd.set_gait_name('turn_left')
 
-        else:
-            if self.control_cmd.is_walking == True:
-                self.get_logger().info(f'stop')
-                self.control_cmd.stop_gait()
-
+            else:
+                if self.control_cmd.is_walking == True:
+                    self.get_logger().info(f'stop')
+                    self.control_cmd.stop_gait()
+            
         
+
 
             
 

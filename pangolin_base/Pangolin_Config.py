@@ -19,29 +19,13 @@ class PangolinConfiguration:
         self.leg_motor_direction = np.array([1, -1, 1, -1]) # 1-2
                                                             # 3-4
 
-<<<<<<< HEAD
         self.leg_center_position = np.array([2045, 2045, 2045, 2045, 2045, 2300, 2045, 2045])
 
 
-=======
-        self.leg_center_position = np.array([2045, 2045, 2045, 2045, 2045, 2045, 2045, 2045])
-
-
-<<<<<<< Updated upstream
-        self.move_forward = 20
-        self.move_backward = -20
-        self.turn_forward = 20
-        self.turn_backward = -20
-=======
->>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
         self.move_forward = 15
         self.move_backward = -15
         self.turn_forward = 25
         self.turn_backward = -25
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
 
         self.max_linear_vel = self.leg_length * 0.001 *0.001 * np.sin(np.deg2rad(self.move_forward)) * 2/3 / self.dt #0.00216 m/s
         
@@ -93,8 +77,4 @@ if __name__ == "__main__":
                 break
         except Exception as e:
             traceback.print_exc()
-<<<<<<< HEAD
             break
-=======
-            break
->>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0

@@ -51,15 +51,16 @@ class PangolinControl:
 
         gait_num = 0
         while self.is_walking == True:
-            print("walking")
+            # print("walking")
             gait = self.pangolin_gait.gait_dic[self.gait_name]
+
             if gait_num >= len(gait): gait_num = 0
             leg_gait_position = gait[gait_num]
             gait_num += 1
-            leg_angle, head_angle, spine_angle = self.pangolin_kinematic.calculate_joint(self.gait_name, leg_gait_position, self.req_vel)
+            leg_angle, head_angle, spine_angle = self.pangolin_kinematic.calculate_joint(self.gait_name, leg_gait_position, self.req_vel, self.is_walking)
             
             motor_position = self.angle_to_servo(leg_angle, head_angle, spine_angle)
-            # print(motor_position)
+            #print(motor_position)
             self.control_cmd.motor_position_control(motor_position)
 
             
@@ -80,6 +81,10 @@ class PangolinControl:
 
         return self.motor_position
 
+    def start_walking(self, gait_name='move_linear'):
+        self.stop_gait()
+        self.set_gait_name(gait_name)
+        self.start_gait()
 
     def start_gait(self):
         """Starts the gait in a thread."""

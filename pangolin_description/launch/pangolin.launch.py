@@ -52,12 +52,12 @@ def generate_launch_description():
         #     name="joint_state_publisher_gui",
         #     # condition=launch.conditions.UnlessCondition(LaunchConfiguration("gui")),
         # ),
-        # Node(
-        #     package="rviz2",
-        #     executable="rviz2",
-        #     name="rviz2",
-        #     arguments=["-d" + default_rviz_path]
-        #     # condition=launch.conditions.UnlessCondition(LaunchConfiguration("gui")),
-        # ),
+        Node(
+            package="rviz2",
+            executable="rviz2",
+            name="rviz2",
+            arguments=["-d" + default_rviz_path]
+            # condition=launch.conditions.UnlessCondition(LaunchConfiguration("gui")),
+        ),
 
     ])

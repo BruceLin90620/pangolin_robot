@@ -84,7 +84,6 @@ def generate_launch_description():
                         PythonLaunchDescriptionSource(navigation_launch)
                     )
                 ]
-<<<<<<< HEAD
             ),
             # battery state
             Node(
@@ -94,9 +93,6 @@ def generate_launch_description():
                 output='screen',
                 parameters=[]  
             ),
-=======
-            )
->>>>>>> a7124cf98cc1936d07e2465d3109449fe67444c0
         ]
 
     # 創建並返回啟動描述

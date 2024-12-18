@@ -88,7 +88,8 @@ class PangolinKinematic:
                     self.spine_speedMax = 0
                     self.spine_value = -16.0
                 
-                spine_angle = np.array([self.spine_value, 0])
+                # spine_angle = np.array([self.spine_value, 0]) # for cute
+                spine_angle = np.zeros(2)
                 # print("spine angle (smooth):", spine_angle)
             else:
                 if round(self.req_vel.linear.x, 1) > 0:  # fix the problem that when using keyboard control, key 'M', and key '>' have opposite direction
@@ -100,10 +101,10 @@ class PangolinKinematic:
                 # Increment or decrement based on angular.z direction, up to max of 30 or -30
                 
                 if round(self.req_vel.angular.z, 1) < 0:
-                    self.spine_value = 20 #30
+                    self.spine_value = 30 #30
                     # self.spine_value = min(self.spine_value + 1, 20) #30
                 else:
-                    self.spine_value = -20 #30
+                    self.spine_value = -30 #30
                     # self.spine_value = max(self.spine_value - 1, -20) #30
                 
                 spine_angle = np.array([self.spine_value, 0])

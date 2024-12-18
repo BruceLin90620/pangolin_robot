@@ -96,7 +96,7 @@ class AprilTagLocalization(Node):
             pose.position.z = robot_pose_map.translation.z
             pose.orientation = robot_pose_map.rotation
 
-            # self.get_logger().info(f"Robot pose in map frame: {pose}")
+            self.get_logger().info(f"Robot pose in map frame: {pose}")
             self.send_pose_update(pose)
         except Exception as e:
             self.get_logger().error(f'Failed to compute transform: {str(e)}')

@@ -26,7 +26,7 @@ class Pangolin(Node):
         self.cmd_vel_subscriber_ = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 1)
         
 
-        self.timer = self.create_timer(6.0, self.timer_callback)
+        # self.timer = self.create_timer(6.0, self.timer_callback)
         self.current_motion_index = 0
         self.motions = [
             ('turn_left', 1.0, 0.0),
@@ -106,10 +106,10 @@ class Pangolin(Node):
     def timer_callback(self):
         
         if not self.is_random_walk_mode:
-            
+            # self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
+
             self.control_cmd.stop_gait()
-            self.control_cmd.start_gait()
-            # 執行當前動作
+
             motion_type, angular_z, linear_x = self.motions[self.current_motion_index]
             msg = Twist()
             msg.angular.z = angular_z
@@ -118,9 +118,9 @@ class Pangolin(Node):
 
             self.control_cmd.set_velocity(msg)
             self.control_cmd.set_gait_name(motion_type)
-            # self.control_cmd.start_gait()
+            self.control_cmd.start_gait()
 
-            # 更新到下一個動作
+
             self.current_motion_index = (self.current_motion_index + 1) % len(self.motions)
 
 
@@ -132,8 +132,8 @@ class Pangolin(Node):
             msg.linear.x = 1.0
 
         self.control_cmd.set_velocity(msg)
-        self.get_logger().info(f'self.control_cmd.is_walking: {self.control_cmd.is_walking}')
-        self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
+        # self.get_logger().info(f'self.control_cmd.is_walking: {self.control_cmd.is_walking}')
+        # self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
 
         if self.is_random_walk_mode:
             if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:

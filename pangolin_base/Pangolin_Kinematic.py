@@ -101,10 +101,10 @@ class PangolinKinematic:
                 # Increment or decrement based on angular.z direction, up to max of 30 or -30
                 
                 if round(self.req_vel.angular.z, 1) < 0:
-                    self.spine_value = 30 #30
+                    self.spine_value = 28 #30
                     # self.spine_value = min(self.spine_value + 1, 20) #30
                 else:
-                    self.spine_value = -30 #30
+                    self.spine_value = -28 #30
                     # self.spine_value = max(self.spine_value - 1, -20) #30
                 
                 spine_angle = np.array([self.spine_value, 0])

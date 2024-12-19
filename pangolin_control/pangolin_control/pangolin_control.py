@@ -23,21 +23,20 @@ class Pangolin(Node):
         self.control_cmd = PangolinControl()
 
         self.joy_subscriber_ = self.create_subscription(Joy, 'joy', self.joy_callback, 0)
-        self.cmd_vel_subscriber_ = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 1)
+        self.cmd_vel_subscriber_ = self.create_subscription(Twist, '/robot/cmd_vel', self.cmd_vel_callback, 1)
         
 
-        # self.timer = self.create_timer(6.0, self.timer_callback)
+        # self.timer = self.create_timer(6.0, self.timer_callback) # Random walk mode timer, delete if you dont want to use random mode
         self.current_motion_index = 0
         self.motions = [
             ('turn_left', 1.0, 0.0),
             ('move_linear', 0.0, 1.0),
             ('turn_right', -1.0, 0.0),
             ('move_linear', 0.0, 1.0)
-            
         ]
         
         self.is_first_time = True
-        self.is_random_walk_mode = False
+        self.is_random_walk_mode = True # False
         self.last_joy_msgs_buttons = []
 
 
@@ -63,50 +62,12 @@ class Pangolin(Node):
             self.is_random_walk_mode = not self.is_random_walk_mode
 
         self.last_joy_msgs_buttons = msg.buttons
-        
 
-    # def cmd_vel_callback(self, msg):
-    #     if not self.is_random_walk_mode:
-    #         if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
-    #             msg.linear.x = 1.0
-
-    #         self.control_cmd.set_velocity(msg)
-    #         self.get_logger().info(f'{self.control_cmd.motor_position}')
-    #         self.get_logger().info(f'{msg.linear.x}')
-    #         self.get_logger().info(f'{msg.angular.z}')
-
-    #         if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0 or round(msg.linear.y, 1)!=0) and msg != None:
-    #             if self.control_cmd.is_walking == False :
-    #                 self.get_logger().info(f'start_gait')
-
-    #             if round(msg.linear.x, 1) != 0:
-    #                 self.get_logger().info(f'cmd_vel linear')
-    #                 self.control_cmd.stop_gait()
-    #                 self.control_cmd.set_gait_name('move_linear')
-    #                 self.control_cmd.start_gait()
-                    
-    #             elif round(msg.angular.z, 1) < 0:
-    #                 self.get_logger().info(f'cmd_vel turn_right')
-    #                 self.control_cmd.stop_gait()
-    #                 self.control_cmd.set_gait_name('turn_right')
-    #                 self.control_cmd.start_gait()
-
-    #             elif round(msg.angular.z, 1) > 0:
-    #                 self.get_logger().info(f'cmd_vel turn_left')
-    #                 self.get_logger().info(f'{msg}')
-    #                 self.control_cmd.stop_gait()
-    #                 self.control_cmd.set_gait_name('turn_left')
-    #                 self.control_cmd.start_gait()
-
-    #         else:
-    #             if self.control_cmd.is_walking == True:
-    #                 self.get_logger().info(f'stop')
-    #                 self.control_cmd.stop_gait()
 
     def timer_callback(self):
         
         if not self.is_random_walk_mode:
-            # self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
+            self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
 
             self.control_cmd.stop_gait()
 
@@ -124,40 +85,36 @@ class Pangolin(Node):
             self.current_motion_index = (self.current_motion_index + 1) % len(self.motions)
 
 
-
-
-
     def cmd_vel_callback(self, msg):
         if msg.linear.x <= 1.0 and msg.linear.x > 0.05:
             msg.linear.x = 1.0
 
         self.control_cmd.set_velocity(msg)
-        # self.get_logger().info(f'self.control_cmd.is_walking: {self.control_cmd.is_walking}')
         # self.get_logger().info(f'self.is_random_walk_mode : {self.is_random_walk_mode}')
 
-        if self.is_random_walk_mode:
-            if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
-                if self.control_cmd.is_walking == False:
-                    self.control_cmd.start_gait()
-                    self.get_logger().info(f'start_gait')
+        # if self.is_random_walk_mode:
+        if (round(msg.linear.x, 1) != 0 or round(msg.angular.z, 1) != 0) and msg != None:
+            if self.control_cmd.is_walking == False:
+                self.control_cmd.start_gait()
+                self.get_logger().info(f'start_gait')
 
-                if round(msg.linear.x, 1) != 0:
-                    self.get_logger().info(f'cmd_vel linear')
-                    self.control_cmd.set_gait_name('move_linear')
-                    
-                elif round(msg.angular.z, 1) < 0:
-                    self.get_logger().info(f'cmd_vel turn_right')
-                    self.control_cmd.set_gait_name('turn_right')
+            if round(msg.linear.x, 1) != 0:
+                self.get_logger().info(f'cmd_vel linear')
+                self.control_cmd.set_gait_name('move_linear')
+                
+            elif round(msg.angular.z, 1) < 0:
+                self.get_logger().info(f'cmd_vel turn_right')
+                self.control_cmd.set_gait_name('turn_right')
 
-                elif round(msg.angular.z, 1) > 0:
-                    self.get_logger().info(f'cmd_vel turn_left')
-                    self.control_cmd.set_gait_name('turn_left')
+            elif round(msg.angular.z, 1) > 0:
+                self.get_logger().info(f'cmd_vel turn_left')
+                self.control_cmd.set_gait_name('turn_left')
 
-            else:
-                if self.control_cmd.is_walking == True:
-                    self.get_logger().info(f'stop')
-                    self.control_cmd.stop_gait()
-            
+        else:
+            if self.control_cmd.is_walking == True:
+                self.get_logger().info(f'stop')
+                self.control_cmd.stop_gait()
+        
         
 
 

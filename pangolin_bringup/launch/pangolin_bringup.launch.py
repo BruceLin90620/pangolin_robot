@@ -1,13 +1,14 @@
 import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription, OpaqueFunction, TimerAction
+from launch.actions import IncludeLaunchDescription, OpaqueFunction, TimerAction, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
-    # 使用 FindPackageShare 以提高可移植性
+
     pangolin_control_dir = FindPackageShare('pangolin_control')
     pangolin_description_dir = FindPackageShare('pangolin_description')
     fdlink_ahrs_dir = FindPackageShare('fdlink_ahrs')
@@ -16,10 +17,20 @@ def generate_launch_description():
     apriltag_localize_dir = FindPackageShare('apriltag_localize')
     nav2_vslam_localize_dir = FindPackageShare('nav2_vslam_localize')
     navigation_dir = FindPackageShare('pangolin_navigation')
-    pangolin_teleop_dir = FindPackageShare('pangolin_bringup')
+    pangolin_bringup_dir = FindPackageShare('pangolin_bringup')
     map_yaml_file = LaunchConfiguration('map')
 
-    # 啟動文件
+    # default_config_joystick = os.path.join(get_package_share_directory('pangolin_bringup'),
+    #                                        'config', 'joystick.yaml')
+    twist_mux_config = os.path.join(
+        get_package_share_directory('pangolin_bringup'),
+        'config',
+        'twist_mux.yaml'
+    )
+    # twist_mux_config = os.path.join(config_dir, 'twist_mux.yaml')
+
+    # config_file = os.path.join(pangolin_bringup_dir, 'config', 'twist_mux.yaml')
+
     pangolin_control_launch = PathJoinSubstitution(
         [pangolin_control_dir, 'launch', 'drive_controller.launch.py']
     )
@@ -27,7 +38,7 @@ def generate_launch_description():
         [pangolin_description_dir, 'launch', 'pangolin.launch.py']
     )
     pangolin_teleop_launch = PathJoinSubstitution(
-        [pangolin_teleop_dir, 'launch', 'teleop.launch.py']
+        [pangolin_bringup_dir, 'launch', 'teleop.launch.py']
     )
     ahrs_driver_launch = PathJoinSubstitution(
         [fdlink_ahrs_dir, 'launch', 'ahrs_driver.launch.py']
@@ -100,6 +111,19 @@ def generate_launch_description():
                 output='screen',
                 parameters=[]  
             ),
+            # DeclareLaunchArgument(
+            # 'config_joy',
+            # default_value=config_dir,
+            # description='Default joystick config file'),
+
+            Node(
+                package='twist_mux',
+                executable='twist_mux',
+                name='twist_mux',
+                parameters=[{'use_sim_time': False},
+                          twist_mux_config],
+                remappings=[('cmd_vel_out', '/robot/cmd_vel')]
+            )
         ]
 
     # 創建並返回啟動描述

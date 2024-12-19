@@ -72,7 +72,7 @@ def generate_launch_description():
                     'publish_odom_to_base_tf': True,
                     'publish_map_to_odom_tf': True,
                     'sync_matching_threshold_ms': 10.0,  # 提高圖像同步閾值
-                    'image_jitter_threshold_ms': 50.0,   # 提高連續圖像時間差閾值
+                    'image_jitter_threshold_ms': 150.0,   # 提高連續圖像時間差閾值
                     'imu_jitter_threshold_ms': 20.0,     # 提高 IMU 時間差閾值
                     }],
         remappings=[('visual_slam/image_0', 'camera/infra1/image_rect_raw'),

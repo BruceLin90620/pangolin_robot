@@ -20,7 +20,6 @@ import launch_ros.actions
 #         ),
 #     ])
 
-
 def generate_launch_description():
     joy_config = launch.substitutions.LaunchConfiguration('joy_config')
     joy_dev = launch.substitutions.LaunchConfiguration('joy_dev')
@@ -48,6 +47,7 @@ def generate_launch_description():
             package='teleop_twist_joy', 
             executable='teleop_node',
             name='teleop_twist_joy_node', 
-            parameters=[config_filepath]
+            parameters=[config_filepath],
+            remappings=[('cmd_vel', 'cmd_vel_joy')]
         ),
     ])

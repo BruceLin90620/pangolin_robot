@@ -32,7 +32,8 @@ speed_bindings = {
 class TeleopTwistKeyboard(Node):
     def __init__(self):
         super().__init__('teleop_twist_keyboard')
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel_key', 10)
+        # self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.speed = 0.5
         self.turn = 1.0
         self.print_instructions()

@@ -15,12 +15,14 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
     ],
     install_requires=['setuptools'],
+    extras_require={  
+        'test': ['pytest'],
+    },
     zip_safe=True,
     maintainer='bruce',
     maintainer_email='BruceLin90620',
     description='TODO: Package description',
     license='TODO: License declaration',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'pangolin_control = pangolin_control.pangolin_control:main',

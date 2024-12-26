@@ -15,12 +15,14 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
     ],
     install_requires=['setuptools'],
+    extras_require={  
+        'test': ['pytest'],
+    },
     zip_safe=True,
     maintainer='bruce',
     maintainer_email='bruce@todo.todo',
     description='TODO: Package description',
     license='Apache-2.0',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'apriltag_localization_node = apriltag_localize.apriltag_localize:main',

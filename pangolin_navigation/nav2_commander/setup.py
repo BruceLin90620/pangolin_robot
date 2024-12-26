@@ -12,12 +12,14 @@ setup(
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
+    extras_require={  
+        'test': ['pytest'],
+    },
     zip_safe=True,
     maintainer='csl',
     maintainer_email='brucelin90620@gmail.com',
     description='TODO: Package description',
     license='Apache-2.0',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
         ],

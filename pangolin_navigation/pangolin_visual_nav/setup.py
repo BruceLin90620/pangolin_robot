@@ -14,12 +14,14 @@ setup(
         ('share/' + package_name + '/launch', glob('launch/*.py')),
     ],
     install_requires=['setuptools'],
+    extras_require={  
+        'test': ['pytest'],
+    },
     zip_safe=True,
     maintainer='your_name',
     maintainer_email='your_email@example.com',
     description='Description of your package',
     license='License declaration',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'pangolin_visual_nav = pangolin_visual_nav.pangolin_visual_nav:main',

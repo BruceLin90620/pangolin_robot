@@ -77,13 +77,25 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(pangolin_teleop_launch)
             ),
             IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch)
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(isaac_ros_apriltag_launch)
-            ),
-            IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(apriltag_localize_launch)
+            ),
+
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch)
+            # ),
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(isaac_ros_apriltag_launch)
+            # ),
+            TimerAction(
+                period=1.5,
+                actions=[
+                    IncludeLaunchDescription(
+                        PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch),
+                    ),
+                    IncludeLaunchDescription(
+                        PythonLaunchDescriptionSource(isaac_ros_apriltag_launch),
+                    )
+                ]
             ),
             # IncludeLaunchDescription(
             #     PythonLaunchDescriptionSource(nav2_vslam_localize_launch)

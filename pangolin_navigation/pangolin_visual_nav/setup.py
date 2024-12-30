@@ -26,6 +26,10 @@ setup(
         'console_scripts': [
             'pangolin_visual_nav = pangolin_visual_nav.pangolin_visual_nav:main',
             'goal_pose_visualization = pangolin_visual_nav.goal_pose_visualization:main',
+<<<<<<< Updated upstream
+=======
+            'waypoint_nav = pangolin_visual_nav.waypoint_nav:main'
+>>>>>>> Stashed changes
         ],
     },
 )

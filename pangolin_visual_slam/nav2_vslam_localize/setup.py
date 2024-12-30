@@ -25,7 +25,7 @@ setup(
     license='Apache-2.0',
     entry_points={
         'console_scripts': [
-            'vslam_init_pose_node = nav2_vslam_localize.vslam_init_pose_node:main'
+            #'vslam_init_pose_node = nav2_vslam_localize.vslam_init_pose_node:main'
         ],
     },
 )

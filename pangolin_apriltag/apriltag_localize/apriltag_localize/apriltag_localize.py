@@ -29,7 +29,7 @@ class AprilTagLocalization(Node):
         Load AprilTag poses from a YAML file.
         The file path is specified as a ROS parameter.
         """
-        tag_poses_file = self.declare_parameter('tag_poses_file', '/home/pangolin/pangolin_ws/src/pangolin_robot/pangolin_apriltag/apriltag_localize/config/tag_poses.yaml').value
+        tag_poses_file = self.declare_parameter('tag_poses_file', '/home/pangolin/pangolin_ws/src/quadruped_robot_4_DOF/pangolin_apriltag/apriltag_localize/config/tag_poses.yaml').value
         with open(tag_poses_file, 'r') as file:
             self.map_tag_info = yaml.safe_load(file)['tag_info']
 

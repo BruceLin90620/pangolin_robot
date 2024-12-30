@@ -11,7 +11,7 @@ import time
 import os, sys, math
 import numpy as np
 
-sys.path.append('/home/pangolin/pangolin_ws/src/pangolin_robot/pangolin_base')
+sys.path.append('/home/pangolin/pangolin_ws/src/quadruped_robot_4_DOF/pangolin_base')
 
 from Pangolin_ControlCmd import PangolinControl
 from Pangolin_ControlCmd import ControlCmd

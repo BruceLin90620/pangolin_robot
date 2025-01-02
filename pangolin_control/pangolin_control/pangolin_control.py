@@ -114,6 +114,7 @@ class Pangolin(Node):
             if self.control_cmd.is_walking == True:
                 self.get_logger().info(f'stop')
                 self.control_cmd.stop_gait()
+                #self.control_cmd.set_gait_name('IDLE')
         
         
 

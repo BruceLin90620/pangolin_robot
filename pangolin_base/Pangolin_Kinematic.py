@@ -26,8 +26,8 @@ class PangolinKinematic:
         self.is_walking = is_walking
 
         self.leg_angle   = np.zeros(4)
-        self.head_angle   = np.zeros(4)
-        self.spine_angle   = np.zeros(4)
+        self.head_angle   = np.zeros(2)
+        self.spine_angle   = np.zeros(2)
 
         self.leg_angle = self.leg_controller()
         self.head_angle = self.head_controller()
@@ -42,7 +42,6 @@ class PangolinKinematic:
         elif self.req_vel.linear.x < -0.1: self.req_vel.linear.x = -1.0
         
         # print("gait_name",self.gait_name)
-        
         if self.gait_name == 'move_linear':
             leg_angle = np.array(self.leg_position) * self.req_vel.linear.x
             
@@ -58,7 +57,9 @@ class PangolinKinematic:
         
             leg_angle = np.array(self.leg_position) * self.req_vel.angular.z
             # print("leg_angle",leg_angle)
-
+        elif self.gait_name == 'IDLE':
+            leg_angle = np.array(self.leg_position)
+            
         return leg_angle
 
 
@@ -66,7 +67,7 @@ class PangolinKinematic:
         """ Calculates head angles (currently not implemented). """
 
         head_angle = np.zeros(2)
-
+        
         return head_angle
 
 

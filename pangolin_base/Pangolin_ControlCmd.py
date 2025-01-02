@@ -59,7 +59,6 @@ class PangolinControl:
             leg_angle, head_angle, spine_angle = self.pangolin_kinematic.calculate_joint(self.gait_name, leg_gait_position, self.req_vel, self.is_walking)
             
             motor_position = self.angle_to_servo(leg_angle, head_angle, spine_angle)
-            #print(motor_position)
             self.control_cmd.motor_position_control(motor_position)
 
     def angle_to_servo(self, leg_motor_angle: np.array, head_motor_angle: np.array, spine_motor_angle: np.array)-> np.array: 

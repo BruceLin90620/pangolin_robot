@@ -1,11 +1,10 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Twist, TransformStamped
+from geometry_msgs.msg import Twist
 from tf2_ros import TransformBroadcaster, Buffer, TransformListener
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import numpy as np
-import pyrealsense2 as rs
 from apriltag import apriltag
 import cv2
 from DXL_motor_control import DXL_Communication
@@ -13,7 +12,6 @@ from Pangolin_Config import PangolinConfiguration, PangolinDynamixel
 import time
 
 DEGREE_TO_SERVO = 4095 / 360
-
 
 class PangolinControl:
     def __init__(self):
@@ -32,6 +30,11 @@ class PangolinControl:
         self.motor_position[4:6] = head_motor_pos
         self.control_cmd.motor_position_control(self.motor_position)
 
+    def set_tail_position(self, yaw_angle: float):
+        tail_motor_angle = np.array([yaw_angle])
+        tail_motor_pos = tail_motor_angle * DEGREE_TO_SERVO + self.leg_center_position[6:8]
+        self.motor_position[6:8] = tail_motor_pos
+        self.control_cmd.motor_position_control(self.motor_position)
 
 class ControlCmd:
     def __init__(self):
@@ -42,8 +45,10 @@ class ControlCmd:
 
         head_motor_Y = self.dynamixel.createMotor('motor5', motor_number=5)
         head_motor_P = self.dynamixel.createMotor('motor6', motor_number=6)
+        tail_motor_Y = self.dynamixel.createMotor('motor7', motor_number=7)
 
         self.head_motor_list = [head_motor_Y, head_motor_P]
+        self.tail_motor_list = [tail_motor_Y]
 
         self.dynamixel.rebootAllMotor()
         self.dynamixel.updateMotorData()
@@ -54,32 +59,31 @@ class ControlCmd:
         self.disable_all_motor()
 
     def enable_all_motor(self):
-        for motor in self.head_motor_list:
+        for motor in self.head_motor_list + self.tail_motor_list:
             motor.enableMotor()
             motor.directWriteData(40, 112, 4)
 
     def disable_all_motor(self):
-        for motor in self.head_motor_list:
+        for motor in self.head_motor_list + self.tail_motor_list:
             motor.disableMotor()
 
         self.dynamixel.closeHandler()
 
     def motor_position_control(self, position: np.array):
         motor_id = 4
-        for motor in self.head_motor_list:
+        for motor in self.head_motor_list + self.tail_motor_list:
             motor.writePosition(int(position[motor_id]))
             motor_id += 1
 
         self.dynamixel.sentAllCmd()
         time.sleep(0.1)
 
-
 class RealSenseHeadControl(Node):
     def __init__(self):
         super().__init__('realsense_head_control')
 
         # ROS2 Publishers
-        self.camera_publisher = self.create_publisher(Image, 'camera/image_raw', 10)
+        #self.camera_publisher = self.create_publisher(Image, 'camera/image_raw', 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, 'cmd_vel_key', 10)
 
         # Initialize TF Broadcaster and Listener
@@ -92,13 +96,6 @@ class RealSenseHeadControl(Node):
 
         # AprilTag Detector
         self.detector = apriltag("tag36h11")
-
-        # RealSense pipeline
-        self.pipeline = rs.pipeline()
-        self.config = rs.config()
-        self.config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-        self.config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
-        self.pipeline.start(self.config)
 
         # Initialize CvBridge
         self.bridge = CvBridge()
@@ -116,24 +113,25 @@ class RealSenseHeadControl(Node):
         self.detection_timeout = 1.0
 
         # Timer for processing frames
-        self.timer = self.create_timer(1 / 60, self.process_frames)
+        #self.timer = self.create_timer(1 / 60, self.process_camera_frame)
+
+        # Subscribe to RealSense topic provided by Isaac ROS
+        self.create_subscription(
+            Image, '/image', self.camera_callback, 10
+        )
 
         self.get_logger().info("RealSense Head Control with AprilTag Following initialized.")
 
-    def process_frames(self):
-        """Capture and process frames from the RealSense camera."""
-        frames = self.pipeline.wait_for_frames()
-        color_frame = frames.get_color_frame()
-        depth_frame = frames.get_depth_frame()
+    def camera_callback(self, msg):
+        """Callback for receiving camera frames."""
+        try:
+            color_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            self.process_camera_frame(color_image)
+        except Exception as e:
+            self.get_logger().error(f"Failed to process camera frame: {e}")
 
-        if not color_frame or not depth_frame:
-            self.get_logger().error("Failed to capture RealSense frames.")
-            self.publish_cmd_vel(0.0, 0.0)
-            return
-
-        color_image = np.asanyarray(color_frame.get_data())
-        self.publish_camera_frame(color_image)
-
+    def process_camera_frame(self, color_image):
+        """Process camera frame and detect AprilTags."""
         gray_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
         detections = self.detector.detect(gray_image)
 
@@ -144,12 +142,12 @@ class RealSenseHeadControl(Node):
 
                 if tag_id == self.tag0_id:
                     # Robot following logic
-                    self.follow_robot(center, depth_frame)
+                    self.follow_robot(center)
                     return
 
                 elif tag_id == self.tag1_id:
                     # Head following logic
-                    self.follow_head(center)
+                    self.follow_head_and_tail(center,color_image)
                     return
 
         # Handle no detections or timeout
@@ -163,13 +161,12 @@ class RealSenseHeadControl(Node):
             self.get_logger().info("No valid AprilTag detected. Stopping the robot.")
             self.publish_cmd_vel(0.0, 0.0)
 
-    def follow_robot(self, center=None, depth_frame=None, use_last_transform=False):
+    def follow_robot(self, center=None, use_last_transform=False):
         """Follow AprilTag with ID `tag0_id`."""
-        #self.pangolin_control.set_head_position(yaw_angle=0, pitch_angle=-20)
         if use_last_transform:
             translation = self.last_transform
         else:
-            translation = self.calculate_translation(center, depth_frame)
+            translation = self.calculate_translation(center)
             if translation is None:
                 return
 
@@ -182,7 +179,7 @@ class RealSenseHeadControl(Node):
 
         # Proportional control for velocities
         linear_velocity = 0.5 if distance > 0.2 else 0.0
-        angular_velocity = -1.0 if lateral_error > 0.1 else (1.0 if lateral_error < -0.1 else 0.0)
+        angular_velocity = -1.0 if lateral_error > -0.4 else (1.0 if lateral_error < -0.7 else 0.0) #lateral_error=0.1
 
         self.publish_cmd_vel(linear_velocity, -angular_velocity)
         self.get_logger().info(
@@ -190,18 +187,25 @@ class RealSenseHeadControl(Node):
             f"Linear Velocity: {linear_velocity}, Angular Velocity: {angular_velocity}"
         )
 
-    def follow_head(self, center):
+    def follow_head_and_tail(self, center, color_image):
         """Follow AprilTag with ID `tag1_id`."""
-        error_x = (center[0] - 1280 / 2) / (1280 / 2)  # Horizontal error
-        error_y = (center[1] - 960 / 2) / (960 / 2)  # Vertical error
+        # Adjusted for 1920x1080 resolution
+        image_width = color_image.shape[1]
+        image_height = color_image.shape[0]
+
+        error_x = (center[0] - image_width / 2) / (image_width / 2)
+        error_y = (center[1] - image_height / 2) / (image_height / 2)
+
+        self.get_logger().info(f"Center X: {center[0]}, Error X: {error_x}")
+        self.get_logger().info(f"Center Y: {center[1]}, Error Y: {error_y}")
 
         # Proportional control constants
-        Kp_yaw = 35  # Reduce from 40
-        Kp_pitch = 35  # Reduce from 50
+        Kp_yaw = 35  # Increased for more responsive movement
+        Kp_pitch = 33
 
         # Dead zone thresholds
-        dead_zone_x = 0.05  # Ignore small horizontal errors
-        dead_zone_y = 0.05  # Ignore small vertical errors
+        dead_zone_x = 0.1 #0.05
+        dead_zone_y = 0.1 #0.05
 
         # Apply dead zone logic
         if abs(error_x) < dead_zone_x:
@@ -209,12 +213,12 @@ class RealSenseHeadControl(Node):
         if abs(error_y) < dead_zone_y:
             error_y = 0.0
 
-        # Calculate adjustments with damping
+        # Calculate adjustments with extended range
         yaw_adjustment = np.clip(Kp_yaw * error_x, -35.0, 35.0)
-        pitch_adjustment = np.clip(Kp_pitch * error_y, -30.0, 30.0)
+        pitch_adjustment = np.clip(Kp_pitch * error_y, -45.0, 45.0)
 
-        # Ensure adjustments do not cause abrupt movements
-        smoothing_factor = 0.7
+        #Smoothing adjustments
+        smoothing_factor = 0.55  # Higher value for smoother transitions
         yaw_adjustment = (
             smoothing_factor * yaw_adjustment + (1 - smoothing_factor) * getattr(self, 'last_yaw_adjustment', 0.0)
         )
@@ -228,32 +232,21 @@ class RealSenseHeadControl(Node):
 
         # Update head position
         self.pangolin_control.set_head_position(yaw_angle=-yaw_adjustment, pitch_angle=-pitch_adjustment)
+        # Tail movement proportional to yaw
+        tail_angle = yaw_adjustment 
+        self.pangolin_control.set_tail_position(yaw_angle=tail_angle)
 
+        # Logging for debugging
         self.get_logger().info(
-            f"Head Following | Center: {center}, Yaw: {-yaw_adjustment:.2f}, Pitch: {-pitch_adjustment:.2f}"
+            f"Head Following | Center: {center}, Error X: {error_x:.2f}, "
+            f"Yaw: {-yaw_adjustment:.2f}, Pitch: {-pitch_adjustment:.2f}"
         )
 
 
-    def calculate_translation(self, center, depth_frame):
-        """Calculate 3D translation for the detected AprilTag."""
-        x, y = int(center[0]), int(center[1])
-        depth = depth_frame.get_distance(x, y)
-
-        if depth <= 0:
-            self.get_logger().warning("Invalid depth value detected.")
-            return None
-
-        intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
-        translation = rs.rs2_deproject_pixel_to_point(intrinsics, [x, y], depth)
-        return translation
-
-    def publish_camera_frame(self, frame):
-        """Publish the camera frame as a ROS2 Image message."""
-        try:
-            image_message = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')
-            self.camera_publisher.publish(image_message)
-        except Exception as e:
-            self.get_logger().error(f"Failed to publish camera frame: {e}")
+    def calculate_translation(self, center):
+        """Placeholder for 3D translation logic."""
+        # Isaac ROS provides depth data in a separate topic. Add logic to calculate translation if needed.
+        return [center[0] / 640 - 1, center[1] / 480 - 1, 1.0]  # Example values
 
     def publish_cmd_vel(self, linear, angular):
         """Publish cmd_vel to control the robot."""
@@ -282,3 +275,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+

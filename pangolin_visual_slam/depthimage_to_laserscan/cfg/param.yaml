@@ -1,0 +1,10 @@
+depthimage_to_laserscan:
+  ros__parameters:
+    range_min: 0.45                     # Minimum valid range (adjust as per your sensor)
+    range_max: 10.0                     # Maximum valid range
+    scan_height: 10                     # Number of rows to process in the depth image
+    output_frame: "camera_depth_optical_frame"           # Change to "camera_depth_optical_frame" if needed
+    angle_min: -1.5708                  # Minimum angle for the scan (e.g., -90 degrees)
+    angle_max: 1.5708                   # Maximum angle for the scan (e.g., 90 degrees)
+    angle_increment: 0.01               # Angular resolution of the scan
+    queue_size: 10                      # Queue size for message processing

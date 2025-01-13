@@ -8,8 +8,8 @@ def generate_launch_description():
             executable='depthimage_to_laserscan_node',
             name='depthimage_to_laserscan',
             remappings=[
-                ('/depth', '/camera/camera/depth/image_rect_raw'),
-                ('/depth_camera_info', '/camera/camera/depth/camera_info'),
+                ('/depth', '/camera/depth/image_rect_raw'),
+                ('/depth_camera_info', '/camera/depth/camera_info'),
             ],
             parameters=[
                 {'range_min': 0.2},           # Minimum range in meters

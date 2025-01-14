@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, PoseStamped
+from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Path
 import numpy as np
 
@@ -17,6 +18,7 @@ class RealWorldPathFinder(Node):
         )
         self.create_subscription(Path, '/visual_slam/tracking/slam_path', self.current_pose_callback, 10)
         self.create_subscription(PoseStamped, '/goal_pose', self.goal_pose_callback, 10)
+        self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
 
         # State variables
         self.current_pose = None
@@ -24,6 +26,7 @@ class RealWorldPathFinder(Node):
         self.state = "IDLE" # Default state
         self.angular_errors = []  # To store angular errors over time
         self.distance_errors = []  # To store distance errors over time
+        self.obstacle_detected = False
 
         # Tolerances
         self.linear_tolerance = 0.1
@@ -32,6 +35,8 @@ class RealWorldPathFinder(Node):
         # Speed settings
         self.max_linear_speed = 1.0  
         self.max_angular_speed = 0.5  
+        self.obstacle_stop_distance = 0.5
+        self.safe_distance = 0.8
 
         # Timer to run navigation logic periodically(0.1 second)
         self.timer = self.create_timer(0.1, self.navigation_loop)
@@ -44,6 +49,14 @@ class RealWorldPathFinder(Node):
         self.goal_pose = msg.pose
         self.get_logger().info(f"Goal Pose: {self.goal_pose.position.x}, {self.goal_pose.position.y}")
         self.state = "NAVIGATE"
+    
+    def scan_callback(self, msg):
+        # Process laser scan data to detect obstacles
+        self.obstacle_detected = False
+        for r in msg.ranges:
+            if not np.isnan(r) and msg.range_min < r < self.obstacle_stop_distance:
+                self.obstacle_detected = True
+                break
 
     def navigation_loop(self):
         if self.state == "IDLE" or self.state == "DONE":
@@ -79,6 +92,12 @@ class RealWorldPathFinder(Node):
             self.get_logger().info("Goal reached. Waiting for a new goal.")
             self.state = "IDLE"  # Reset to IDLE to wait for the next goal
             self.plot_results()
+            return
+    
+        # Handle obstacle avoidance
+        if self.obstacle_detected:
+            self.get_logger().info("Obstacle detected! Stopping and avoiding.")
+            self.publish_velocity(0.0, 0.0)
             return
 
         # Navigation logic
@@ -135,3 +154,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+

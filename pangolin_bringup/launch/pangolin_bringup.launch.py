@@ -17,6 +17,7 @@ def generate_launch_description():
     apriltag_localize_dir = FindPackageShare('apriltag_localize')
     nav2_vslam_localize_dir = FindPackageShare('nav2_vslam_localize')
     navigation_dir = FindPackageShare('pangolin_navigation')
+    depthimage_to_laserscan_dir = FindPackageShare('depth_to_laserscan_setup')
     pangolin_bringup_dir = FindPackageShare('pangolin_bringup')
     map_yaml_file = LaunchConfiguration('map')
 
@@ -55,6 +56,10 @@ def generate_launch_description():
         [apriltag_localize_dir, 'launch', 'apriltag_localize.launch.py']
     )
 
+    depthimage_to_laserscan = PathJoinSubstitution(
+        [depthimage_to_laserscan_dir, 'launch', 'depth_to_laserscan.launch.py']
+    )
+
     nav2_vslam_localize_launch = PathJoinSubstitution(
         [nav2_vslam_localize_dir, 'launch', 'nav2_vslam_localize.launch.py']
     )
@@ -79,7 +84,6 @@ def generate_launch_description():
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(apriltag_localize_launch)
             ),
-
             # IncludeLaunchDescription(
             #     PythonLaunchDescriptionSource(isaac_ros_visual_slam_launch)
             # ),
@@ -96,6 +100,9 @@ def generate_launch_description():
                         PythonLaunchDescriptionSource(isaac_ros_apriltag_launch),
                     )
                 ]
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(depthimage_to_laserscan)
             ),
             # IncludeLaunchDescription(
             #     PythonLaunchDescriptionSource(nav2_vslam_localize_launch)

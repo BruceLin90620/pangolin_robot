@@ -5,6 +5,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Path
 import numpy as np
+from visualization_msgs.msg import Marker
 
 class RealWorldPathFinder(Node):
     def __init__(self):
@@ -16,12 +17,20 @@ class RealWorldPathFinder(Node):
             '/cmd_vel_nav', #Velocity command for navigation
             qos_profile=rclpy.qos.QoSProfile(depth=1, reliability=rclpy.qos.ReliabilityPolicy.RELIABLE)
         )
+
+        self.marker_pub = self.create_publisher(
+            Marker,
+            '/path_marker',  # Marker for RViz visualization
+            qos_profile=rclpy.qos.QoSProfile(depth=1)
+        )
+
         self.create_subscription(Path, '/visual_slam/tracking/slam_path', self.current_pose_callback, 10)
         self.create_subscription(PoseStamped, '/goal_pose', self.goal_pose_callback, 10)
         self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
 
         # State variables
         self.current_pose = None
+        self.starting_pose = None 
         self.goal_pose = None
         self.state = "IDLE" # Default state
         self.angular_errors = []  # To store angular errors over time
@@ -47,89 +56,112 @@ class RealWorldPathFinder(Node):
 
     def goal_pose_callback(self, msg):
         self.goal_pose = msg.pose
-        self.get_logger().info(f"Goal Pose: {self.goal_pose.position.x}, {self.goal_pose.position.y}")
-        self.state = "NAVIGATE"
+        if self.starting_pose is None:
+            self.starting_pose = self.current_pose
+        self.get_logger().info(f"New Goal Pose: {self.goal_pose.position.x}, {self.goal_pose.position.y}")
+        self.state = "NAVIGATE"  # Reset state to NAVIGATE for the new goal
+
     
     def scan_callback(self, msg):
-        # Process laser scan data to detect obstacles
-        self.obstacle_detected = False
-        for r in msg.ranges:
-            if not np.isnan(r) and msg.range_min < r < self.obstacle_stop_distance:
-                self.obstacle_detected = True
-                break
+        if len(msg.ranges) == 0:
+            self.get_logger().warn("Laser scan ranges are empty!")
+            return
+
+        ranges = np.array(msg.ranges)
+        ranges = np.nan_to_num(ranges, nan=msg.range_max)  # Replace NaN with max range
+
+        # Divide scan ranges into three sections: left, center, right
+        left = ranges[:int(len(ranges) // 2.5)]
+        center = ranges[int(len(ranges) // 3):int(2 * len(ranges) // 3)]
+        right = ranges[int(2 * len(ranges) // 2.5):]
+
+        self.obstacle_left = np.any((left > msg.range_min) & (left < self.obstacle_stop_distance))
+        self.obstacle_center = np.any((center > msg.range_min) & (center < self.obstacle_stop_distance))
+        self.obstacle_right = np.any((right > msg.range_min) & (right < self.obstacle_stop_distance))
+
 
     def navigation_loop(self):
         if self.state == "IDLE" or self.state == "DONE":
-            # Still update the current position via callbacks but do nothing here.
             return
 
         if self.current_pose is None or self.goal_pose is None:
             return
 
-        # Compute errors
-        x = self.current_pose.position.x
-        y = self.current_pose.position.y
-        theta = self.quaternion_to_yaw(self.current_pose.orientation)
-
-        # Get goal position
-        x_goal = self.goal_pose.position.x
-        y_goal = self.goal_pose.position.y
-
-        x_diff = x_goal - x
-        y_diff = y_goal - y
-        distance_to_goal = np.hypot(x_diff, y_diff)
-        target_angle = np.arctan2(y_diff, x_diff)
-        angular_error = self.normalize_angle(target_angle - theta)
-
-        # Log errors for plotting
-        self.distance_errors.append(distance_to_goal)
-        self.angular_errors.append(angular_error)
-
-        # Check if we have reached the goal
-        if distance_to_goal <= self.linear_tolerance:
-            # Goal reached, stop
-            self.publish_velocity(0.0, 0.0)
-            self.get_logger().info("Goal reached. Waiting for a new goal.")
-            self.state = "IDLE"  # Reset to IDLE to wait for the next goal
-            self.plot_results()
-            return
-    
-        # Handle obstacle avoidance
-        if self.obstacle_detected:
-            self.get_logger().info("Obstacle detected! Stopping and avoiding.")
-            self.publish_velocity(0.0, 0.0)
-            return
-
-        # Navigation logic
-        if abs(angular_error) > np.pi / 2:  # If the angle between current and goal position is less than pi/2, resume
-            linear_speed = -min(self.max_linear_speed, distance_to_goal)  # Reverse
-            angular_speed = max(-self.max_angular_speed, min(self.max_angular_speed, angular_error / 2))
+        # Check if obstacles are detected
+        if self.obstacle_center:
+            # Obstacle in the middle - move backward
+            self.publish_velocity(-0.5, 0.0)
+        elif self.obstacle_left:
+            # Obstacle on the left - move to the right
+            self.publish_velocity(0.0, -1.0)
+        elif self.obstacle_right:
+            # Obstacle on the right - move to the left
+            self.publish_velocity(0.0, 1.0)
         else:
-            linear_speed = min(self.max_linear_speed, distance_to_goal)
-            angular_speed = max(-self.max_angular_speed, min(self.max_angular_speed, angular_error))
+            # Resume navigation
+            x = self.current_pose.position.x
+            y = self.current_pose.position.y
+            theta = self.quaternion_to_yaw(self.current_pose.orientation)
 
-        # Publish the computed velocity
-        self.publish_velocity(linear_speed, angular_speed)
+            x_goal = self.goal_pose.position.x
+            y_goal = self.goal_pose.position.y
+
+            x_diff = x_goal - x
+            y_diff = y_goal - y
+            distance_to_goal = np.hypot(x_diff, y_diff)
+            target_angle = np.arctan2(y_diff, x_diff)
+            angular_error = self.normalize_angle(target_angle - theta)
+
+            if distance_to_goal <= self.linear_tolerance:
+                self.publish_velocity(0.0, 0.0)
+                self.get_logger().info("Goal reached! Waiting for the next goal...")
+                self.state = "DONE"  # Set state to DONE after reaching goal
+                return
+
+            if abs(angular_error) > np.pi / 2:
+                linear_speed = -min(self.max_linear_speed, distance_to_goal)
+                angular_speed = max(-self.max_angular_speed, min(self.max_angular_speed, angular_error / 2))
+            else:
+                linear_speed = min(self.max_linear_speed, distance_to_goal)
+                angular_speed = max(-self.max_angular_speed, min(self.max_angular_speed, angular_error))
+
+            # Visualize path in RViz
+            self.visualize_path_in_rviz()
+
+            self.publish_velocity(linear_speed, angular_speed)
+
+    def visualize_path_in_rviz(self):
+        if self.starting_pose and self.goal_pose:
+            marker = Marker()
+            marker.header.frame_id = "map"  # Adjust the frame to match your setup
+            marker.header.stamp = self.get_clock().now().to_msg()
+            marker.ns = "path"
+            marker.id = 0
+            marker.type = Marker.LINE_STRIP
+            marker.action = Marker.ADD
+            marker.scale.x = 0.05  # Thickness of the line
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+            marker.color.a = 1.0  # Alpha (opacity)
+
+            # Add the starting point
+            start_point = self.create_point(self.starting_pose.position.x, self.starting_pose.position.y, 0.0)
+            # Add the goal point
+            goal_point = self.create_point(self.goal_pose.position.x, self.goal_pose.position.y, 0.0)
+
+            marker.points.append(start_point)
+            marker.points.append(goal_point)
+
+            # Publish the marker
+            self.marker_pub.publish(marker)
+
 
     def publish_velocity(self, linear_x, angular_z):
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_x
         cmd_vel_msg.angular.z = -angular_z
         self.cmd_vel_pub.publish(cmd_vel_msg)
-
-    def plot_results(self):
-        """Plot the robot's error reductions."""
-        plt.figure()
-        #plt.subplot(2, 1, 2)
-        plt.plot(self.distance_errors, label="Distance Error", color='blue')
-        plt.plot(self.angular_errors, label="Angular Error", color='orange')
-        plt.xlabel('Time Steps')
-        plt.ylabel('Error')
-        plt.title('Errors Over Time')
-        plt.legend()
-        plt.grid()
-        plt.tight_layout()
-        plt.show()
 
     @staticmethod
     def quaternion_to_yaw(orientation):
@@ -140,6 +172,15 @@ class RealWorldPathFinder(Node):
     @staticmethod
     def normalize_angle(angle):
         return (angle + np.pi) % (2 * np.pi) - np.pi
+
+    @staticmethod
+    def create_point(x, y, z):
+        from geometry_msgs.msg import Point
+        point = Point()
+        point.x = x
+        point.y = y
+        point.z = z
+        return point
 
 def main(args=None):
     rclpy.init(args=args)

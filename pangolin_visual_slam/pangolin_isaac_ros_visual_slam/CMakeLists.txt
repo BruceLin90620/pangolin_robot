@@ -17,7 +17,8 @@ find_package(ament_cmake REQUIRED)
 # Install
 ################################################################################
 install(
-  DIRECTORY launch map rviz
+  DIRECTORY launch 
+  rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

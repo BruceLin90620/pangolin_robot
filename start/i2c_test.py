@@ -69,6 +69,7 @@ class I2CReader:
             return capacity
             
         except Exception as e:
+            
             print(f"讀取電池容量失敗: {str(e)}")
             return None
         

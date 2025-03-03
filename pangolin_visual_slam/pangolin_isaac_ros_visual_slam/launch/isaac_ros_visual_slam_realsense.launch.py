@@ -49,16 +49,17 @@ def generate_launch_description():
         plugin='nvidia::isaac_ros::visual_slam::VisualSlamNode',
         parameters=[{
                     'enable_image_denoising': True,
+                    'enable_ground_constraint_in_odometry': True,
                     'rectified_images': True,
                     'enable_planar_mode': True,
-                    'enable_imu_fusion': False,
+                    'enable_imu_fusion': True,
                     'enable_localization_n_mapping': True,
-                    'gyro_noise_density': 0.000244,
-                    'gyro_random_walk': 0.000019393,
-                    'accel_noise_density': 0.001862,
-                    'accel_random_walk': 0.003,
+                    'gyro_noise_density': 0.001, #0.000244
+                    'gyro_random_walk': 0.0001, #0.000019393
+                    'accel_noise_density': 0.005, #0.001862
+                    'accel_random_walk': 0.006, #0.003
                     'calibration_frequency': 200.0,
-                    'image_jitter_threshold_ms': 45.00,
+                    # 'image_jitter_threshold_ms': 45.00,
                     'base_frame': 'base_footprint',
                     'imu_frame': 'imu_link',
                     'enable_slam_visualization': True,
@@ -70,6 +71,9 @@ def generate_launch_description():
                     ],
                     'publish_odom_to_base_tf': True,
                     'publish_map_to_odom_tf': True,
+                    'sync_matching_threshold_ms': 10.0,  # 提高圖像同步閾值
+                    'image_jitter_threshold_ms': 150.0,   # 提高連續圖像時間差閾值
+                    'imu_jitter_threshold_ms': 20.0,     # 提高 IMU 時間差閾值
                     }],
         remappings=[('visual_slam/image_0', 'camera/infra1/image_rect_raw'),
                     ('visual_slam/camera_info_0', 'camera/infra1/camera_info'),

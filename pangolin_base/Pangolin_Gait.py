@@ -39,6 +39,9 @@ class PangolinGait:
                                             [self.turn_backward,                  0,                  0,  self.turn_forward],
                                             [                 0,                  0,                  0,                  0],
                             ],
+                            "IDLE":         [[                0,                  0,                  0,                  0],
+                                            [                 0,                  0,                  0,                  0],
+                            ],
                             }
 
     

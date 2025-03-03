@@ -1,0 +1,29 @@
+/**:
+  ros__parameters:
+    topics:
+      navigation:
+        name: navigation
+        topic: cmd_vel_nav
+        priority: 10
+        timeout: 1.0
+      joystick:
+        name: joystick
+        topic: cmd_vel_joy
+        priority: 100
+        timeout: 1.0
+      keyboard:
+        name: keyboard
+        topic: cmd_vel_key
+        priority: 90
+        timeout: 1.0
+    locks:
+      pause:
+        name: pause
+        topic: pause_navigation
+        priority: 100
+        timeout: 0.0
+      e_stop:
+        name: e_stop
+        topic: e_stop
+        priority: 200
+        timeout: 0.0
